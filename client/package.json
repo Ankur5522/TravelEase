@@ -11,10 +11,12 @@
   "dependencies": {
     "@clerk/clerk-expo": "^0.20.5",
     "@react-native-async-storage/async-storage": "^1.21.0",
+    "@react-native-community/datetimepicker": "^7.6.2",
     "@react-native-community/netinfo": "^11.3.1",
     "@react-navigation/bottom-tabs": "^6.5.12",
     "@react-navigation/stack": "^6.3.23",
     "@reduxjs/toolkit": "^2.2.1",
+    "@tighten/react-native-time-input": "^1.0.3",
     "axios": "^1.6.7",
     "expo": "^50.0.8",
     "expo-status-bar": "~1.11.1",
