@@ -24,6 +24,7 @@ router.post('/login', async (req, res) => {
 });
 
 router.post('/checkUser', async (req, res) => {
+  console.log("hiiii");
   const { phoneNumber } = req.body;
 
   try {

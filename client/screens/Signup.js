@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet ,TouchableOpacity} from "react-native";
 import { useSignUp } from "@clerk/clerk-expo";
 import { useDispatch } from "react-redux";
 import { signupUser } from "../actions/userActions";
@@ -78,44 +78,48 @@ const SignupScreen = () => {
 
     return (
         !otpSent ? (<View style={styles.container}>
-            <Text style={styles.appTitle}>TravelEase</Text>
+             <View style={styles.header}>
+                <Text style={styles.welcomeText}>Hello!! Register here to</Text>
+                <Text style={styles.subText}>get started!</Text>
+            </View>
             {error && <Text style={styles.error}>{error}</Text>}
-            <Text style={styles.label}>Name:</Text>
             <TextInput
                 style={styles.input}
+                placeholder="Enter your name"
                 onChangeText={(value) => handleInputChange("name", value)}
                 value={formData.name}
             />
-
-            <Text style={styles.label}>Phone Number:</Text>
             <TextInput
                 style={styles.input}
-                onChangeText={(value) =>
-                    handleInputChange("phoneNumber", value)
-                }
+                placeholder="Enter your phone number"
+                onChangeText={(value) => handleInputChange("phoneNumber", value)}
                 value={formData.phoneNumber}
                 keyboardType="phone-pad"
             />
 
-            <Text style={styles.label}>Password:</Text>
             <TextInput
                 style={styles.input}
+                placeholder="Enter your password"
                 onChangeText={(value) => handleInputChange("password", value)}
                 value={formData.password}
                 secureTextEntry={true}
             />
-
-            <Text style={styles.label}>Confirm Password:</Text>
             <TextInput
                 style={styles.input}
-                onChangeText={(value) =>
-                    handleInputChange("confirmPassword", value)
-                }
+                placeholder="Confirm your password"
+                onChangeText={(value) => handleInputChange("confirmPassword", value)}
                 value={formData.confirmPassword}
                 secureTextEntry={true}
             />
 
-            <Button title="Sign Up" onPress={handleSignup} />
+            <TouchableOpacity style={styles.button} onPress={handleSignup}>
+                <Text style={styles.buttonText}>Sign Up</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.googleButtonContainer}>
+                <View style={styles.googleButton}>
+                    <Text style={styles.buttonText}>Continue with Google</Text>
+                </View>
+            </TouchableOpacity>
         </View>) : (
             <View style={styles.otpContainer}>
                 <TextInput
@@ -134,35 +138,66 @@ const SignupScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: "center",
-        paddingHorizontal: 20,
+        justifyContent: "flex-start",
+        alignItems: "flex-start",
+        padding: 16,
+        backgroundColor: "white",
     },
-    otpContainer: {
-        flex: 1,
-        justifyContent: "center",
-        paddingHorizontal: 20,
+    header: {
+        marginTop:'15%',
+        alignItems: "flex-start",
+        marginBottom: 35,
+    },
+    welcomeText: {
+        fontSize: 35,
+        fontWeight: "bold",
+    },
+    subText: {
+        fontSize: 35,
+        fontWeight: "bold",
     },
     label: {
         marginBottom: 5,
     },
     input: {
         width: "100%",
-        height: 40,
-        borderWidth: 1,
-        borderColor: "#ccc",
-        borderRadius: 5,
-        paddingHorizontal: 10,
-        marginBottom: 10,
-    },
-    appTitle: {
-        fontSize: 30,
-        marginBottom: 30,
-        alignSelf: "center",
+        height: 45,
+        borderColor: "#4CAF85",
+        marginBottom: 12,
+        paddingHorizontal: 16,
+        borderRadius: 20,
+        backgroundColor: "#F6F6F6",
+        marginBottom:15,
     },
     error: {
         color: "red",
         marginBottom: 10,
-        alignSelf: "center",
+    },
+    button: {
+        marginTop:20,
+        backgroundColor: "#1D4550",
+        width: "100%",
+        borderRadius: 5,
+        paddingVertical: 12,
+        marginBottom: 20,
+    },
+    googleButtonContainer: {
+        width: "100%",
+        alignItems: "flex-start",
+        marginBottom: 30,
+    },
+    googleButton: {
+        backgroundColor: "#1D4550",
+        width: "100%",
+        borderRadius: 5,
+        paddingVertical: 12,
+        marginBottom: 20,
+    },
+    buttonText: {
+        color: "white",
+        textAlign: "center",
+        fontSize: 18,
+        fontWeight: "bold",
     },
 });
 
