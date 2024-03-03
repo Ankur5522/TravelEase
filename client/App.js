@@ -18,15 +18,15 @@ const store = configureStore({
 });
 
 export default function App() {
-  const [networkError, setNetworkError] = useState(true);
+  const [networkError, setNetworkError] = useState(false);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
         console.log(state)
       if (!state.isInternetReachable) {
-        setNetworkError(false);
-      } else {
         setNetworkError(true);
+      } else {
+        setNetworkError(false);
       }
     })
     unsubscribe();

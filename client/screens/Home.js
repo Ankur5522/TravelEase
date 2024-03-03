@@ -9,14 +9,38 @@ import {
     TouchableOpacity,
     Animated,
     KeyboardAvoidingView,
-    Platform
+    Platform,
 } from "react-native";
 import upperPartBg from "../assets/upperPartBg.png";
 import upperFormIcon from "../assets/upperFormIcon.png";
+import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const Home = () => {
-    const [selectedOption, setSelectedOption] = useState(null);
+    const [selectedOption, setSelectedOption] = useState("offer");
     const [sliderAnimation] = useState(new Animated.Value(0));
+    const [date, setDate] = useState(new Date());
+    const [formData, setFormData] = useState({
+        from: "",
+        to: "",
+        time: new Date(),
+        seatVacant: 0,
+    });
+    const [show, setShow] = useState(false);
+
+    const onChange = (event, selectedDate) => {
+        const currentDate = selectedDate || date;
+        setShow(Platform.OS === "ios");
+        setDate(currentDate);
+        setFormData({ ...formData, time: currentDate });
+    };
+
+    const handleChange = (key, value) => {
+        setFormData({ ...formData, [key]: value });
+    };
 
     const handleOptionSelect = (option) => {
         setSelectedOption(option);
@@ -28,7 +52,7 @@ const Home = () => {
     };
 
     return (
-            <View style={styles.container}>
+        <View style={styles.container}>
             <View style={styles.upperPart}>
                 <ImageBackground
                     source={upperPartBg}
@@ -56,6 +80,9 @@ const Home = () => {
                                         fontWeight: "700",
                                         width: "100%",
                                     }}
+                                    onChangeText={(text) =>
+                                        handleChange("from", text)
+                                    }
                                 />
                             </View>
                             <View style={styles.upperInputContainer}>
@@ -74,18 +101,24 @@ const Home = () => {
                                         fontWeight: "700",
                                         width: "100%",
                                     }}
+                                    onChangeText={(text) =>
+                                        handleChange("to", text)
+                                    }
                                 />
                             </View>
                         </View>
                     </View>
                 </ImageBackground>
             </View>
-            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{flex: 2}}>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                style={{ flex: 2 }}
+            >
                 <View style={styles.lowerPart}>
                     <View style={styles.optionContainer}>
                         <TouchableOpacity
                             onPress={() => handleOptionSelect("offer")}
-                            style={{ width: "50%", alignItems: "center"}}
+                            style={{ width: "50%", alignItems: "center" }}
                         >
                             <Text
                                 style={[
@@ -99,7 +132,7 @@ const Home = () => {
                         </TouchableOpacity>
                         <TouchableOpacity
                             onPress={() => handleOptionSelect("request")}
-                            style={{ width: "50%", alignItems: "center"}}
+                            style={{ width: "50%", alignItems: "center" }}
                         >
                             <Text
                                 style={[
@@ -125,8 +158,164 @@ const Home = () => {
                     </View>
                     {selectedOption && (
                         <View style={styles.selectedContent}>
-                            <Text>You selected: {selectedOption}</Text>
-                            {/* Add your content for the selected option here */}
+                            <View
+                                style={[
+                                    styles.timeContainer,
+                                    {
+                                        borderBottomWidth: 1,
+                                        borderBottomColor: "#D8D8D84F",
+                                    },
+                                ]}
+                            >
+                                <View
+                                    style={{
+                                        flexDirection: "row",
+                                        alignItems: "center",
+                                    }}
+                                >
+                                    <MaterialIcons
+                                        name="access-time"
+                                        size={32}
+                                        color="black"
+                                    />
+                                    <Text
+                                        style={{
+                                            marginLeft: 5,
+                                            fontSize: 18,
+                                            fontWeight: "bold",
+                                        }}
+                                    >
+                                        Time
+                                    </Text>
+                                </View>
+                                {show && (
+                                    <DateTimePicker
+                                        value={date}
+                                        mode="time"
+                                        is24Hour={true}
+                                        display="spinner"
+                                        onChange={onChange}
+                                    />
+                                )}
+                                <Text
+                                    onPress={() => setShow(true)}
+                                    style={{
+                                        fontSize: 16,
+                                        fontWeight: "bold",
+                                    }}
+                                >
+                                    {date.toLocaleTimeString()}
+                                </Text>
+                            </View>
+                            {selectedOption === "offer" && (
+                                <View style={styles.timeContainer}>
+                                    <View
+                                        style={{
+                                            flexDirection: "row",
+                                            alignItems: "center",
+                                        }}
+                                    >
+                                        <MaterialCommunityIcons
+                                            name="account-outline"
+                                            size={34}
+                                            color="black"
+                                        />
+                                        <Text
+                                            style={{
+                                                marginLeft: 5,
+                                                fontSize: 18,
+                                                fontWeight: "bold",
+                                            }}
+                                        >
+                                            Seats Vacant
+                                        </Text>
+                                    </View>
+                                    <View
+                                        style={{
+                                            flexDirection: "row",
+                                            alignItems: "center",
+                                        }}
+                                    >
+                                        <Entypo
+                                            name="minus"
+                                            size={28}
+                                            color="black"
+                                            onPress={() => {
+                                                setFormData({
+                                                    ...formData,
+                                                    seatVacant:
+                                                        formData.seatVacant > 0
+                                                            ? formData.seatVacant - 1
+                                                            : 0,
+                                                });
+                                            }}
+                                        />
+                                        <TextInput
+                                            style={{
+                                                fontSize: 22,
+                                                textAlign: "center",
+                                                fontWeight: "bold",
+                                                marginHorizontal: 3,
+                                            }}
+                                            value={formData.seatVacant.toString()}
+                                            onChangeText={(value) => {
+                                                if (!isNaN(value)) {
+                                                    setFormData({
+                                                        ...formData,
+                                                        seatVacant: parseInt(
+                                                            value
+                                                        ),
+                                                    });
+                                                }
+                                            }}
+                                            keyboardType="numeric"
+                                        />
+                                        <Entypo
+                                            name="plus"
+                                            size={28}
+                                            color="black"
+                                            onPress={() =>
+                                                setFormData({
+                                                    ...formData,
+                                                    seatVacant: formData.seatVacant + 1,
+                                                })
+                                            }
+                                        />
+                                    </View>
+                                </View>
+                            )}
+                            <TouchableOpacity>
+                                <View
+                                    style={{
+                                        flexDirection: "row",
+                                        backgroundColor: "#1D4550",
+                                        height: 50,
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        marginHorizontal: 30,
+                                        borderRadius: 10,
+                                        marginTop: 30,
+                                    }}
+                                >
+                                    <Text
+                                        style={{
+                                            color: "white",
+                                            fontSize: 18,
+                                            fontWeight: "bold",
+                                            marginRight: 10,
+                                        }}
+                                    >
+                                        {selectedOption === "offer"
+                                            ? "Offer Ride"
+                                            : "Request Ride"}
+                                    </Text>
+                                    <AntDesign
+                                        name="right"
+                                        size={18}
+                                        color="white"
+                                    />
+                                </View>
+                            </TouchableOpacity>
                         </View>
                     )}
                 </View>
@@ -140,11 +329,11 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     upperPart: {
-        flex: 1.3,
+        flex: 1.35,
         backgroundColor: "lightblue",
     },
     upperFormContainer: {
-        marginTop: 110,
+        marginTop: 100,
         paddingLeft: 19,
         paddingRight: 19,
     },
@@ -163,7 +352,7 @@ const styles = StyleSheet.create({
         width: "90%",
         height: 113,
         borderRadius: 17,
-        marginTop: 16,
+        marginTop: 14,
         alignSelf: "left",
     },
     upperInputContainer: {
@@ -174,6 +363,7 @@ const styles = StyleSheet.create({
     },
     lowerPart: {
         flex: 2,
+        justifyContent: "flex-start",
     },
     optionContainer: {
         flexDirection: "row",
@@ -198,7 +388,15 @@ const styles = StyleSheet.create({
     },
     selectedContent: {
         backgroundColor: "white",
-        height: "100%"
+        height: "100%",
+    },
+    timeContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        paddingHorizontal: 30,
+        height: 60,
+        marginTop: 10,
     },
 });
 
