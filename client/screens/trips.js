@@ -1,15 +1,32 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
     View,
     Text,
     StyleSheet,
     TextInput,
     ImageBackground,
+    FlatList,
+    SafeAreaView,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import TripCard from "./helpComponents/tripCard";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchGroups } from "../actions/groupActions";
 
 const Trips = () => {
+    const groupState = useSelector((state) => state.groups);
+    const [groups, setGroups] = useState([]);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(fetchGroups())
+            .unwrap()
+            .then((response) => setGroups(response))
+            .catch((error) => {
+                alert(error);
+            });
+    }, []);
+
     return (
         <View style={styles.container}>
             <ImageBackground
@@ -24,9 +41,13 @@ const Trips = () => {
                     />
                 </View>
             </ImageBackground>
-            <View style={styles.tripsContainer}>
-                <TripCard />
-            </View>
+            <SafeAreaView style={styles.tripsContainer}>
+                <FlatList
+                    data={groups}
+                    renderItem={({ item }) => <TripCard group={item} />}
+                    keyExtractor={(item) => item._id}
+                />
+            </SafeAreaView>
         </View>
     );
 };

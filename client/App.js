@@ -22,7 +22,6 @@ export default function App() {
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
-        console.log(state)
       if (!state.isInternetReachable) {
         setNetworkError(true);
       } else {
@@ -31,7 +30,6 @@ export default function App() {
     })
     unsubscribe();
   }, []);
-  console.log(networkError)
   return (
     <ClerkProvider
       publishableKey={Constants.expoConfig.extra.clerkPublishableKey}

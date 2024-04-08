@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { View, TextInput, TouchableOpacity, StyleSheet, Text } from "react-native";
 import { useDispatch } from "react-redux";
-import { loginUser } from "../actions/userActions";
+import { useSignUp } from "@clerk/clerk-expo";
+import { Link } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { loginUser } from "../actions/userActions";
 
 const Login = () => {
     const [formData, setFormData] = useState({ phoneNumber: "", password: "" });
@@ -10,29 +12,70 @@ const Login = () => {
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
     const [errorMsg, setErrorMsg] = useState(null);
     const dispatch = useDispatch();
+    const { signUp, setActive} = useSignUp();
+    const otpInputs = useRef([]);
 
     const handleLogin = async () => {
-        if (!otpVisible) {
-            setOtpVisible(true);
-            return;
-        }
-        
-        const otpValue = otp.join("");
-        const response = await dispatch(loginUser({ ...formData, otp: otpValue }));
-        if(response.payload && response.payload.user) {
-            const JSONvalue = JSON.stringify(response.payload.user);
-            await AsyncStorage.setItem("user", JSONvalue);
-        }
-        if(response.error) {
-            setErrorMsg("Invalid phone number or password");
+        try {
+            const response = await dispatch(loginUser(formData));
+            if(response.payload.error) {
+                setErrorMsg(response.payload.error);
+                return;
+            }
+            if (response && response.payload.user) {
+                await signUp.create({
+                    phoneNumber: `+91${formData.phoneNumber}`,
+                });
+                await signUp.preparePhoneNumberVerification();
+                setOtpVisible(true);
+            } else {
+                setErrorMsg("Invalid phone number or password");
+            }
+        } catch (error) {
+            setErrorMsg("An error occurred while logging in");
         }
     };
+    
+
+    const handleVerifyOTP = async () => {
+        try {
+            const newOtp = otp.join("");
+            console.log(typeof newOtp)
+            await signUp.attemptPhoneNumberVerification({
+                code: newOtp,
+            }).then( async (response) => {
+                const res = await dispatch(loginUser(formData))
+                if(res.payload && res.payload.user) {
+                    const JSONvalue = JSON.stringify(res.payload.user);
+                    await AsyncStorage.setItem("user", JSONvalue);
+                }
+            }).catch((error) => {
+                setErrorMsg("Invalid OTP");
+            });
+            
+            await setActive({session: signUp.createdSessionId});
+        } catch (error) {
+            console.error('Error verifying OTP:', error);
+        }
+    }
 
     const handleChangeOtp = (index, value) => {
         const newOtp = [...otp];
         newOtp[index] = value;
         setOtp(newOtp);
+        // If value is entered and there are more OTP inputs, focus on the next input
+        if (value && index < otpInputs.current.length - 1) {
+            otpInputs.current[index + 1].focus();
+        }
     };
+
+    const handleClick = () => {
+        if (!otpVisible) {
+            handleLogin();
+        } else {
+            handleVerifyOTP();
+        }
+    }
 
     return (
         <View style={styles.container}>
@@ -40,6 +83,7 @@ const Login = () => {
                 <Text style={styles.welcomeText}>Welcome Back! Glad to</Text>
                 <Text style={styles.subText}>see you Again!</Text>
             </View>
+            <Text>{errorMsg}</Text>
             <View style={styles.inputContainer}>
                 <TextInput
                     style={styles.input}
@@ -59,10 +103,14 @@ const Login = () => {
                         setFormData({ ...formData, password: text })
                     } 
                 />
+                <TouchableOpacity>
+                        <Text style={styles.forgotPassword}>Forget Password</Text>
+                    </TouchableOpacity>
                 {otpVisible && (
                     <View style={styles.otpContainer}>
                         {[...Array(6)].map((_, index) => (
                             <TextInput
+                                ref={(ref) => (otpInputs.current[index] = ref)}
                                 key={index}
                                 style={styles.otpInput}
                                 placeholder="•"
@@ -74,25 +122,22 @@ const Login = () => {
                         ))}
                     </View>
                 )}
-                    <TouchableOpacity>
-                        <Text style={styles.forgotPassword}>Forget Password</Text>
-                    </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.buttonContainer} onPress={handleLogin}>
+            <TouchableOpacity style={styles.buttonContainer} onPress={handleClick}>
                 <View style={styles.button}>
                     <Text style={styles.buttonText}>{otpVisible ? "Verify OTP" : "Send OTP"}</Text>
                 </View>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonContainer}>
-                <View style={styles.button}>
-                    <Text style={styles.buttonText}>Continue with Google</Text>
+            <TouchableOpacity style={[styles.googleButtonContainer]}>
+                <View style={styles.googleButton}>
+                    <Text style={[styles.buttonText, {color: "#1D4550"}]}>Continue with Google</Text>
                 </View>
             </TouchableOpacity>
             
                 <View style={styles.signUpContainer}>
-                    <Text style={{marginRight: 5}}>Don't have an account?</Text>
+                    <Text style={{marginRight: 5, fontSize: 16}}>Don't have an account?</Text>
                     <TouchableOpacity>
-                        <Text style={styles.signUpLink}>Sign Up</Text>
+                        <Link to="/Signup" style={{borderBottomWidth: 1}}>Sign Up</Link>
                     </TouchableOpacity>
                 </View>
         </View>
@@ -149,13 +194,26 @@ const styles = StyleSheet.create({
         width: "100%",
         borderRadius: 5,
         paddingVertical: 12,
-        marginBottom:20,
     },
     buttonText: {
         color: "white",
         textAlign: "center",
         fontSize: 18,
         fontWeight: "bold",
+    },
+    googleButtonContainer: {
+        width: "100%",
+        alignItems: "flex-start",
+        borderBlockColor: "#1D4550",
+        marginBottom: 15
+    },
+    googleButton: {
+        width: "100%",
+        borderRadius: 5,
+        paddingVertical: 12,
+        marginBottom: 20,
+        borderWidth: 2,
+        borderColor: "#1D4550",
     },
     signUpContainer: {
         flexDirection: "row",

@@ -1,9 +1,17 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet ,TouchableOpacity} from "react-native";
+import {
+    View,
+    Text,
+    TextInput,
+    Button,
+    StyleSheet,
+    TouchableOpacity,
+} from "react-native";
 import { useSignUp } from "@clerk/clerk-expo";
 import { useDispatch } from "react-redux";
-import { signupUser } from "../actions/userActions";
+import { checkUser, signupUser } from "../actions/userActions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Link } from "@react-navigation/native";
 
 const SignupScreen = () => {
     const [formData, setFormData] = useState({
@@ -12,7 +20,7 @@ const SignupScreen = () => {
         password: "",
         confirmPassword: "",
     });
-    const { signUp, setActive} = useSignUp();
+    const { signUp, setActive } = useSignUp();
     const [otp, setOtp] = useState("");
     const [otpSent, setOtpSent] = useState(false);
     const [error, setError] = useState(null);
@@ -26,7 +34,7 @@ const SignupScreen = () => {
     };
 
     const handleSignup = () => {
-        const response = handleSendOTP(formData.phoneNumber)
+        const response = handleSendOTP(formData.phoneNumber);
     };
 
     const handleSendOTP = async (phoneNo) => {
@@ -35,50 +43,49 @@ const SignupScreen = () => {
                 setError("Invalid phone number");
                 return;
             }
-    
-            const response = await fetch('http://10.0.2.2:5000/user/checkUser', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ phoneNumber: phoneNo }),
-            });
-    
-            if (response.ok) {
-                await signUp.create({
-                    phoneNumber: `+91${phoneNo}`,
-                });
-                await signUp.preparePhoneNumberVerification();
-                setOtpSent(!otpSent);
-            } else {
-                setError("Phone number already exists");
+
+            const response = await checkUser({ phoneNumber: phoneNo });
+            if (response.error) {
+                alert(response.error);
+                return;
             }
+            await signUp.create({
+                phoneNumber: `+91${phoneNo}`,
+            });
+            await signUp.preparePhoneNumberVerification();
+            setOtpSent(!otpSent);
         } catch (error) {
-            console.error('Error sending OTP:', error);
+            console.error("Error sending OTP:", error);
         }
     };
 
     const handleVerifyOTP = async () => {
         try {
-            await signUp.attemptPhoneNumberVerification({
-                code: otp,
-            }).then( async (response) => {
-                dispatch(signupUser(formData));
-                if(response.payload && response.payload.user) {
-                    const JSONvalue = JSON.stringify(response.payload.user);
-                    await AsyncStorage.setItem("user", JSONvalue);
-                }
-            });
-            
-            await setActive({session: signUp.createdSessionId});
+            await signUp
+                .attemptPhoneNumberVerification({
+                    code: otp,
+                })
+                .then(async (res) => {
+                    console.log(res)
+                    const response = await dispatch(signupUser(formData));
+                    console.log("response",response)
+                    if (response.error) {
+                        alert(response.error);
+                        return;
+                    }
+                    const JSONvalue = JSON.stringify(response.user);
+                    console.log("JSONvalue", JSONvalue);
+                    // await AsyncStorage.setItem("user", JSONvalue);
+                    await setActive({ session: signUp.createdSessionId });
+                });
         } catch (error) {
-            console.error('Error verifying OTP:', error);
+            console.error("Error verifying OTP:", error);
         }
-    }
+    };
 
-    return (
-        !otpSent ? (<View style={styles.container}>
-             <View style={styles.header}>
+    return !otpSent ? (
+        <View style={styles.container}>
+            <View style={styles.header}>
                 <Text style={styles.welcomeText}>Hello!! Register here to</Text>
                 <Text style={styles.subText}>get started!</Text>
             </View>
@@ -92,7 +99,9 @@ const SignupScreen = () => {
             <TextInput
                 style={styles.input}
                 placeholder="Enter your phone number"
-                onChangeText={(value) => handleInputChange("phoneNumber", value)}
+                onChangeText={(value) =>
+                    handleInputChange("phoneNumber", value)
+                }
                 value={formData.phoneNumber}
                 keyboardType="phone-pad"
             />
@@ -107,7 +116,9 @@ const SignupScreen = () => {
             <TextInput
                 style={styles.input}
                 placeholder="Confirm your password"
-                onChangeText={(value) => handleInputChange("confirmPassword", value)}
+                onChangeText={(value) =>
+                    handleInputChange("confirmPassword", value)
+                }
                 value={formData.confirmPassword}
                 secureTextEntry={true}
             />
@@ -117,21 +128,39 @@ const SignupScreen = () => {
             </TouchableOpacity>
             <TouchableOpacity style={styles.googleButtonContainer}>
                 <View style={styles.googleButton}>
-                    <Text style={styles.buttonText}>Continue with Google</Text>
+                    <Text style={[styles.buttonText, { color: "#1D4550" }]}>
+                        Continue with Google
+                    </Text>
                 </View>
             </TouchableOpacity>
-        </View>) : (
-            <View style={styles.otpContainer}>
-                <TextInput
-                    style={styles.input}
-                    onChangeText={(value) => setOtp(value)}
-                    value={formData.otp}
-                    keyboardType="number-pad"
-                />
-                <Button title="Verify OTP" onPress={handleVerifyOTP} />
-                <Button title="back" onPress={() => setOtpSent(!otpSent)} />
+            <View
+                style={{
+                    flexDirection: "row",
+                    width: "100%",
+                    justifyContent: "center",
+                }}
+            >
+                <Text style={{ fontSize: 16, marginRight: 5 }}>
+                    Already have an account?
+                </Text>
+                <TouchableOpacity>
+                    <Link to="/Login" style={{ borderBottomWidth: 1 }}>
+                        Login
+                    </Link>
+                </TouchableOpacity>
             </View>
-        )
+        </View>
+    ) : (
+        <View style={styles.otpContainer}>
+            <TextInput
+                style={styles.input}
+                onChangeText={(value) => setOtp(value)}
+                value={formData.otp}
+                keyboardType="number-pad"
+            />
+            <Button title="Verify OTP" onPress={handleVerifyOTP} />
+            <Button title="back" onPress={() => setOtpSent(!otpSent)} />
+        </View>
     );
 };
 
@@ -144,7 +173,7 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
     },
     header: {
-        marginTop:'15%',
+        marginTop: "15%",
         alignItems: "flex-start",
         marginBottom: 35,
     },
@@ -167,14 +196,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         borderRadius: 20,
         backgroundColor: "#F6F6F6",
-        marginBottom:15,
+        marginBottom: 15,
     },
     error: {
         color: "red",
         marginBottom: 10,
     },
     button: {
-        marginTop:20,
+        marginTop: 20,
         backgroundColor: "#1D4550",
         width: "100%",
         borderRadius: 5,
@@ -184,14 +213,15 @@ const styles = StyleSheet.create({
     googleButtonContainer: {
         width: "100%",
         alignItems: "flex-start",
-        marginBottom: 30,
+        borderBlockColor: "#1D4550",
     },
     googleButton: {
-        backgroundColor: "#1D4550",
         width: "100%",
         borderRadius: 5,
         paddingVertical: 12,
         marginBottom: 20,
+        borderWidth: 2,
+        borderColor: "#1D4550",
     },
     buttonText: {
         color: "white",

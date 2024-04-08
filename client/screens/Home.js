@@ -18,6 +18,9 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { createGroup } from "../actions/groupActions";
+import { useDispatch } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Home = () => {
     const [selectedOption, setSelectedOption] = useState("offer");
@@ -30,6 +33,7 @@ const Home = () => {
         seatVacant: 0,
     });
     const [show, setShow] = useState(false);
+    const dispatch = useDispatch();
 
     const onChange = (event, selectedDate) => {
         const currentDate = selectedDate || date;
@@ -50,6 +54,18 @@ const Home = () => {
             useNativeDriver: false,
         }).start();
     };
+
+    const handleSubmit = async () => {
+        if(formData.from === "" || formData.to === "" || formData.time === "" || formData.seatVacant === 0) {
+            alert("Please fill all the fields")
+            return;
+        }
+        const JSONdata = await AsyncStorage.getItem("user");
+        const user = JSON.parse(JSONdata);
+        formData.owner = user._id;
+        const response = dispatch(createGroup({...formData, owner: user._id}));
+        console.log("respones", response);
+    }
 
     return (
         <View style={styles.container}>
@@ -245,7 +261,8 @@ const Home = () => {
                                                     ...formData,
                                                     seatVacant:
                                                         formData.seatVacant > 0
-                                                            ? formData.seatVacant - 1
+                                                            ? formData.seatVacant -
+                                                              1
                                                             : 0,
                                                 });
                                             }}
@@ -262,9 +279,8 @@ const Home = () => {
                                                 if (!isNaN(value)) {
                                                     setFormData({
                                                         ...formData,
-                                                        seatVacant: parseInt(
-                                                            value
-                                                        ),
+                                                        seatVacant:
+                                                            parseInt(value),
                                                     });
                                                 }
                                             }}
@@ -277,26 +293,16 @@ const Home = () => {
                                             onPress={() =>
                                                 setFormData({
                                                     ...formData,
-                                                    seatVacant: formData.seatVacant + 1,
+                                                    seatVacant:
+                                                        formData.seatVacant + 1,
                                                 })
                                             }
                                         />
                                     </View>
                                 </View>
                             )}
-                            <TouchableOpacity>
-                                <View
-                                    style={{
-                                        flexDirection: "row",
-                                        backgroundColor: "#1D4550",
-                                        height: 50,
-                                        justifyContent: "center",
-                                        alignItems: "center",
-                                        marginHorizontal: 30,
-                                        borderRadius: 10,
-                                        marginTop: 30,
-                                    }}
-                                >
+                            <TouchableOpacity onPress={handleSubmit}>
+                                <View style={styles.offerRideButton}>
                                     <Text
                                         style={{
                                             color: "white",
@@ -397,6 +403,16 @@ const styles = StyleSheet.create({
         paddingHorizontal: 30,
         height: 60,
         marginTop: 10,
+    },
+    offerRideButton: {
+        flexDirection: "row",
+        backgroundColor: "#1D4550",
+        height: 50,
+        justifyContent: "center",
+        alignItems: "center",
+        marginHorizontal: 30,
+        borderRadius: 10,
+        marginTop: 30,
     },
 });
 

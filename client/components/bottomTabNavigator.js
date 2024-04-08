@@ -1,7 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Platform } from 'react-native';
-import Trips from '../screens/trips';
+import Trips from '../screens/Trips';
 import MyGroups from '../screens/MyGroups';
 import Home from '../screens/Home';
 import Profile from '../screens/Profile';
