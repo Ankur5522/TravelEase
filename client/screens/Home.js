@@ -64,7 +64,7 @@ const Home = () => {
         const user = JSON.parse(JSONdata);
         formData.owner = user._id;
         const response = dispatch(createGroup({...formData, owner: user._id}));
-        console.log("respones", response);
+        // console.log("respones", response);
     }
 
     return (

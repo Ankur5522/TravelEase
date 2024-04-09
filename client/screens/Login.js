@@ -40,7 +40,7 @@ const Login = () => {
     const handleVerifyOTP = async () => {
         try {
             const newOtp = otp.join("");
-            console.log(typeof newOtp)
+            
             await signUp.attemptPhoneNumberVerification({
                 code: newOtp,
             }).then( async (response) => {

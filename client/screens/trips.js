@@ -7,6 +7,7 @@ import {
     ImageBackground,
     FlatList,
     SafeAreaView,
+    ScrollView,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import TripCard from "./helpComponents/tripCard";
@@ -14,18 +15,29 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchGroups } from "../actions/groupActions";
 
 const Trips = () => {
-    const groupState = useSelector((state) => state.groups);
+    const groupState = useSelector((state) => state.groups.groups);
     const [groups, setGroups] = useState([]);
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(fetchGroups())
+        const fetchGroupsData = async () => {
+            dispatch(fetchGroups())
             .unwrap()
             .then((response) => setGroups(response))
             .catch((error) => {
                 alert(error);
             });
+        }
+        fetchGroupsData();
+        return () => {setGroups([])}
     }, []);
+
+    useEffect(() => {
+        const setGroupsData = () => {
+            setGroups(groupState)
+        }
+        setGroupsData();
+    },[groupState?.length])
 
     return (
         <View style={styles.container}>

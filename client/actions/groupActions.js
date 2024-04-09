@@ -29,3 +29,36 @@ export const createGroup = createAsyncThunk("groups/createGroup", async (group) 
     }
 })
 
+export const deleteGroup = createAsyncThunk("groups/deleteGroup", async (id) => {
+    try {
+        const response = await axiosInstance.delete(`/group/deleteGroup/${id}`,);
+        if(response.data?.message) {
+            return id;
+        }
+        return;
+    } catch (error) {
+        return error.response ? error.response.data : error.message;
+    }
+})
+
+export const addMemberToGroup = createAsyncThunk("groups/addMemberToGroup", async ({ groupId, userId }) => {
+    try {
+        const response = await axiosInstance.post(`/group/addUserToGroup/${groupId}`, { userId });
+        if(response.data?.message) {
+            return { groupId, userId };
+        }
+    } catch (error) {
+        return error.response ? error.response.data : error.message;
+    }
+})
+
+export const removeMemberFromGroup = createAsyncThunk("groups/removeMemberFromGroup", async ({ groupId, userId }) => {
+    try {
+        const response = await axiosInstance.post(`/group/removeUserFromGroup/${groupId}`, { userId });
+        if(response.data?.message) {
+            return { groupId, userId };
+        }
+    } catch (error) {
+        return error.response ? error.response.data : error.message;
+    }
+})

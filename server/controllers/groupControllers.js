@@ -1,4 +1,5 @@
 import Group from "../models/groupModel.js"
+import User from "../models/userModel.js"
 
 export const getGroups = async (req, res) => {
     try {
@@ -25,7 +26,17 @@ export const createGroup = async (req, res) => {
         if(group.owner === "" || group.from === "" || group.to === "" || group.seatVacant === 0 || group.from === group.to) {
             return res.status(400).json({ error: "Invalid group data" });
         }
-        const newGroup = new Group(group);
+        const user = await User.findById(group.owner);
+        const newGroup = new Group({
+            ownerName: user.name,
+            ownerId: user._id,
+            from: group.from,
+            to: group.to,
+            seatVacant: group.seatVacant,
+            time: group.time,
+            members: [user._id]
+        });
+        console.log(newGroup);
         await newGroup.save();
         res.status(201).json(newGroup);
     } catch (error) {
@@ -39,12 +50,43 @@ export const updateGroup = async (req, res) => {
 
 export const deleteGroup = async (req, res) => {
     const { id } = req.params;
-
-    if (!Group.isValid(id)) {
-        return res.status(404).send(`No group with id: ${id}`);
-    }
-
-    await Group.findByIdAndRemove(id);
-
-    res.json({ error: "Group deleted successfully" });
+    await Group.findByIdAndDelete(id);
+    res.status(200).json({ message: "Group deleted successfully" });
 }
+
+export const addUsertoGroup = async (req, res) => {
+    const { id } = req.params;
+    const { userId } = req.body;
+    try {
+        const group = await Group.findById(id);
+        const user = await User.findById(userId);
+        if(group.members.includes(user._id)) {
+            return res.status(400).json({ error: "User already in group" });
+        }
+        group.members.push(user._id);
+        group.seatVacant = group.seatVacant - 1;
+        await group.save();
+        res.status(200).json({message: "User added to group successfully"});
+    }
+    catch (error) {
+        res.status(404).json({ error: error.message });
+    }
+}
+
+export const removeUserFromGroup = async (req, res) => {
+    const { id } = req.params;
+    const { userId } = req.body;
+    try {
+        const group = await Group.findById(id);
+        const user = await User.findById(userId);
+        if (!group.members.includes(user._id)) {
+            return res.status(400).json({ error: "User not in group" });
+        }
+        group.members = group.members.filter(member => member.toString() !== userId.toString());
+        group.seatVacant = group.seatVacant + 1;
+        await group.save();
+        res.status(200).json({ message: "User removed from group successfully" });
+    } catch (error) {
+        res.status(404).json({ error: error.message });
+    }
+};

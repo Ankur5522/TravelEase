@@ -1,7 +1,11 @@
 import mongoose from 'mongoose';
 
 const groupSchema = new mongoose.Schema({
-    owner: {
+    ownerName: {
+        type: String,
+        required: true
+    },
+    ownerId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
