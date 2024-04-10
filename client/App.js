@@ -48,12 +48,12 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: Constants.statusBarHeight,
+    paddingTop: Constants.statusBarHeight + 10,
   },
   error: {
     position: "absolute",
     backgroundColor: "red",
-    top: Constants.statusBarHeight + 10,
+    top: Constants.statusBarHeight + 15,
     left: 0,
     right: 0,
     backgroundColor: "red",

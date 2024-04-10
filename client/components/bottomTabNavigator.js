@@ -1,11 +1,10 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Platform } from 'react-native';
-import Trips from '../screens/Trips';
 import MyGroups from '../screens/MyGroups';
-import Home from '../screens/Home';
 import Profile from '../screens/Profile';
 import { Ionicons } from '@expo/vector-icons';
+import HomeNavigator from './HomeNavigator';
+import Transactions from '../screens/Transactions';
 
 const Tab = createBottomTabNavigator();
 
@@ -26,16 +25,7 @@ const BottomTabNavigator = () => {
         >
             <Tab.Screen
                 name="Home"
-                component={Home}
-                options={{
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="home-outline" size={size} color={color} />
-                    ),
-                }}
-            />
-            <Tab.Screen
-                name="Trips"
-                component={Trips}
+                component={HomeNavigator}
                 options={{
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name="home-outline" size={size} color={color} />
@@ -52,8 +42,8 @@ const BottomTabNavigator = () => {
                 }}
             />
             <Tab.Screen
-                name="Profile"
-                component={Profile}
+                name="Transactions"
+                component={Transactions}
                 options={{
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name="person-outline" size={size} color={color} />

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import UserAvatar from "react-native-user-avatar";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -11,10 +11,15 @@ import { addMemberToGroup, deleteGroup, removeMemberFromGroup } from "../../acti
 
 const TripCard = ({ group }) => {
     const [user, setUser] = useState({});
-    const [isMember, setIsMember] = useState(false); // Local state to track membership status
+    const [isMember, setIsMember] = useState(false);
     const [seatVacant, setSeatVacant] = useState(group.seatVacant);
-    const { ownerName, ownerId, from, to, time, members } = group;
+    const { ownerName, ownerId, from, to, members } = group;
     const dispatch = useDispatch();
+
+    const timeFormatted = useMemo(() => {
+        const timeDate = new Date(group.time);
+        return timeDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    }, [group.time]);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -61,7 +66,7 @@ const TripCard = ({ group }) => {
                                 size={18}
                                 color="black"
                             />
-                            <Text style={{ marginLeft: 4 }}>{time}</Text>
+                            <Text style={{ marginLeft: 4 }}>{timeFormatted}</Text>
                         </View>
                     </View>
                 </View>
@@ -105,11 +110,14 @@ const TripCard = ({ group }) => {
 
 export default TripCard;
 
+
 const styles = StyleSheet.create({
     container: {
         height: 190,
         padding: 20,
         backgroundColor: "white",
+        marginBottom: 10,
+        borderRadius: 10,
     },
     header: {
         flexDirection: "row",
