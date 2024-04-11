@@ -36,7 +36,6 @@ export const createGroup = async (req, res) => {
             time: group.time,
             members: [user._id]
         });
-        console.log(newGroup);
         await newGroup.save();
         res.status(201).json(newGroup);
     } catch (error) {
@@ -90,3 +89,28 @@ export const removeUserFromGroup = async (req, res) => {
         res.status(404).json({ error: error.message });
     }
 };
+
+export const confirmGroup = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const group = await Group.findById(id);
+        group.confirmed = true;
+        await group.save();
+        res.status(200).json({ message: "Group confirmed successfully" });
+    }
+    catch (error) {
+        res.status(404).json({ error: error.message });
+    }
+}
+
+export const fetchMembers = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const group = await Group.findById(id);
+        const members = await User.find({ _id: { $in: group.members } });
+        res.status(200).json(members);
+    }
+    catch (error) {
+        res.status(404).json({ error: error.message });
+    }
+}

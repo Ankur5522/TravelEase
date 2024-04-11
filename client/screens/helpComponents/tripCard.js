@@ -58,7 +58,7 @@ const TripCard = ({ group }) => {
                     <UserAvatar size={50} name="Avishay Bar" />
                     <View style={{ marginLeft: 12 }}>
                         <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-                            {ownerName}
+                        {ownerName.charAt(0).toUpperCase() + ownerName.slice(1)}
                         </Text>
                         <View style={{ flexDirection: "row" }}>
                             <MaterialIcons

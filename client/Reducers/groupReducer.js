@@ -5,6 +5,8 @@ import {
     deleteGroup,
     addMemberToGroup,
     removeMemberFromGroup,
+    confirmGroup,
+    fetchMembers
 } from "../actions/groupActions";
 
 const initialState = {
@@ -92,7 +94,26 @@ const groupSlice = createSlice({
             })
             .addCase(removeMemberFromGroup.rejected, (state, action) => {
                 state.error = action.payload;
-            });
+            })
+            .addCase(confirmGroup.pending, (state) => {
+                state.error = null;
+            })
+            .addCase(confirmGroup.fulfilled, (state, action) => {
+                const groupIndex = state.groups.findIndex(
+                    (group) => group._id === action.payload
+                );
+                if (groupIndex !== -1) {
+                    const updatedGroup = {
+                        ...state.groups[groupIndex],
+                        confirmed: true
+                    };
+                    state.groups[groupIndex] = updatedGroup;
+                }
+                state.error = null;
+            })
+            .addCase(confirmGroup.rejected, (state, action) => {
+                state.error = action.payload;
+            })
     },
 });
 

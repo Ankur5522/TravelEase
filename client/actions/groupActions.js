@@ -62,3 +62,23 @@ export const removeMemberFromGroup = createAsyncThunk("groups/removeMemberFromGr
         return error.response ? error.response.data : error.message;
     }
 })
+
+export const confirmGroup = createAsyncThunk("groups/confirmGroup", async (id) => {
+    try {
+        const response = await axiosInstance.post(`/group/confirmGroup/${id}`);
+        if(response.data?.message) {
+            return id;
+        }
+    } catch (error) {
+        return error.response ? error.response.data : error.message;
+    }
+})
+
+export const fetchMembers = async (id) => {
+    try {
+        const response = await axiosInstance.post(`/group/fetchMembers/${id}`);
+        return response.data;
+    } catch (error) {
+        return error.response ? error.response.data : error.message;
+    }
+}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
     View,
     Text,
@@ -19,17 +19,22 @@ const Home = () => {
     const groupState = useSelector((state) => state.groups.groups);
     const [groups, setGroups] = useState([]);
     const dispatch = useDispatch();
+    const flatListRef = useRef();
 
     useEffect(() => {
         const fetchGroupsData = async () => {
             dispatch(fetchGroups())
                 .unwrap()
-                .then((response) => setGroups(response))
+                .then((response) => {
+                    const filteredGroups = response.filter(group => !group.confirmed);
+                    setGroups(filteredGroups);
+                })
                 .catch((error) => {
                     alert(error);
                 });
         };
         fetchGroupsData();
+        // groups.length && flatListRef.current?.scrollToIndex({ animated: true, index: groups.length - 1 });
         return () => {
             setGroups([]);
         };
@@ -37,10 +42,12 @@ const Home = () => {
 
     useEffect(() => {
         const setGroupsData = () => {
-            setGroups(groupState);
+            const filteredGroups = groupState.filter(group => !group.confirmed);
+            setGroups(filteredGroups);
         };
         setGroupsData();
-    }, [groupState?.length]);
+        groups.length && flatListRef.current?.scrollToIndex({ animated: true, index: groups.length - 1 });
+    }, [groupState?.length,groupState]);
 
     return (
         <View style={styles.container}>
@@ -55,9 +62,17 @@ const Home = () => {
             </ImageBackground>
             <SafeAreaView style={styles.tripsContainer}>
                 <FlatList
+                    ref={flatListRef}
                     data={groups}
                     renderItem={({ item }) => <TripCard group={item} />}
                     keyExtractor={(item) => item._id}
+                    getItemLayout={(data, index) => ({
+                        length: 200,
+                        offset: 200 * index,
+                        index,
+                    })}
+                    scrollsToTop={true}
+                    inverted={true}
                 />
             </SafeAreaView>
             <TouchableOpacity>

@@ -29,7 +29,15 @@ const groupSchema = new mongoose.Schema({
     members: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-    }]
+    }],
+    confirmed: {
+        type: Boolean,
+        default: false
+    },
+    chatRoomId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'ChatRoom'
+    }
 },{timestamps: true});
 
 const Group = mongoose.model('Group', groupSchema);

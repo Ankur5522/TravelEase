@@ -1,10 +1,9 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import MyGroups from '../screens/MyGroups';
-import Profile from '../screens/Profile';
 import { Ionicons } from '@expo/vector-icons';
 import HomeNavigator from './HomeNavigator';
 import Transactions from '../screens/Transactions';
+import MyGroupNavigator from './myGroupNavigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -33,8 +32,8 @@ const BottomTabNavigator = () => {
                 }}
             />
             <Tab.Screen
-                name="My Groups"
-                component={MyGroups}
+                name="MyGroups"
+                component={MyGroupNavigator}
                 options={{
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name="people-outline" size={size} color={color} />

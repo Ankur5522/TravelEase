@@ -22,7 +22,7 @@ import { createGroup } from "../actions/groupActions";
 import { useDispatch } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Form = () => {
+const Form = ({navigation}) => {
     const [date, setDate] = useState(new Date());
     const [formData, setFormData] = useState({
         from: "",
@@ -57,10 +57,13 @@ const Form = () => {
         const JSONdata = await AsyncStorage.getItem("user");
         const user = JSON.parse(JSONdata);
         formData.owner = user._id;
-        const response = dispatch(
+        dispatch(
             createGroup({ ...formData, owner: user._id })
-        );
-        // console.log("respones", response);
+        ).unwrap().then((res) => {
+            navigation.navigate('Trips');
+        }).catch((err) => {
+            alert(err);
+        });
     };
 
     return (
