@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { fetchMembers } from '../actions/groupActions';
 import { FontAwesome } from '@expo/vector-icons';
+import { Linking } from 'react-native';
 
 const ChatWindow = ({ route }) => {
     const [groupMembers, setGroupMembers] = useState([]);
@@ -27,6 +28,14 @@ const ChatWindow = ({ route }) => {
         setMessage('');
     };
 
+    const handlePhoneCall = (phoneNumber) => {
+        if(Platform.OS === 'android') {
+            Linking.openURL(`tel:${phoneNumber}`);
+        } else {
+            Linking.openURL(`telprompt:${phoneNumber}`);
+        }
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.headingContainer}>
@@ -40,7 +49,9 @@ const ChatWindow = ({ route }) => {
                     renderItem={({ item }) => (
                         <View style={{flexDirection: "row", justifyContent: "space-between"}}>
                             <Text style={{fontSize: 18}}>{item.name.charAt(0).toUpperCase() + item.name.slice(1)}</Text>
-                            <TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => handlePhoneCall(item.phoneNumber)}
+                            >
                                 <FontAwesome name="phone" size={26} color="black" />
                             </TouchableOpacity>
                         </View>

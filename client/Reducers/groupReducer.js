@@ -6,7 +6,6 @@ import {
     addMemberToGroup,
     removeMemberFromGroup,
     confirmGroup,
-    fetchMembers
 } from "../actions/groupActions";
 
 const initialState = {
