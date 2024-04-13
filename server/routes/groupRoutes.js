@@ -8,7 +8,8 @@ import {
     addUsertoGroup,
     removeUserFromGroup,
     confirmGroup,
-    fetchMembers
+    fetchMembers,
+    verifyCode
 } from "../controllers/groupControllers.js";
 
 const router = express.Router();
@@ -22,5 +23,6 @@ router.post("/addUserToGroup/:id", addUsertoGroup);
 router.post("/removeUserFromGroup/:id", removeUserFromGroup);
 router.post("/confirmGroup/:id", confirmGroup);
 router.post("/fetchMembers/:id", fetchMembers);
+router.post("/verifyCode", verifyCode)
 
 export default router;

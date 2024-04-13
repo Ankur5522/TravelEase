@@ -6,6 +6,7 @@ import {
     addMemberToGroup,
     removeMemberFromGroup,
     confirmGroup,
+    verifyCode,
 } from "../actions/groupActions";
 
 const initialState = {
@@ -113,6 +114,28 @@ const groupSlice = createSlice({
             .addCase(confirmGroup.rejected, (state, action) => {
                 state.error = action.payload;
             })
+            .addCase(verifyCode.pending, (state) => {
+                state.error = null;
+            })
+            .addCase(verifyCode.fulfilled, (state, action) => {
+                const { group, userId } = action.payload;
+                const groupIndex = state.groups.findIndex(
+                    (grp) => grp._id === group._id
+                );
+                if (groupIndex !== -1) {
+                    const updatedGroup = {
+                        ...state.groups[groupIndex],
+                        members: [...state.groups[groupIndex].members, userId],
+                    };
+                    state.groups[groupIndex] = updatedGroup;
+                }
+                state.error = null;
+            })
+            .addCase(verifyCode.rejected, (state, action) => {
+                state.error = action.error.message;
+            });
+
+
     },
 });
 

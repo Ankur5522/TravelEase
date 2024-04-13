@@ -20,6 +20,10 @@ export const getGroup = async (req, res) => {
     }
 }
 
+const generateCode = () => {
+    return Math.floor(100000 + Math.random() * 900000);
+};
+
 export const createGroup = async (req, res) => {
     const group = req.body;
     try {
@@ -27,6 +31,15 @@ export const createGroup = async (req, res) => {
             return res.status(400).json({ error: "Invalid group data" });
         }
         const user = await User.findById(group.owner);
+        let code;
+        do {
+            code = generateCode();
+            const existingGroup = await Group.findOne({ code: code });
+            if (!existingGroup) {
+                break;
+            }
+        } while (true);
+        
         const newGroup = new Group({
             ownerName: user.name,
             ownerId: user._id,
@@ -34,14 +47,16 @@ export const createGroup = async (req, res) => {
             to: group.to,
             seatVacant: group.seatVacant,
             time: group.time,
-            members: [user._id]
+            members: [user._id],
+            code: code
         });
         await newGroup.save();
         res.status(201).json(newGroup);
     } catch (error) {
         res.status(409).json({ error: error.message });
     }
-}
+};
+
 
 export const updateGroup = async (req, res) => {
     const { id } = req.params;
@@ -109,6 +124,25 @@ export const fetchMembers = async (req, res) => {
         const group = await Group.findById(id);
         const members = await User.find({ _id: { $in: group.members } });
         res.status(200).json(members);
+    }
+    catch (error) {
+        res.status(404).json({ error: error.message });
+    }
+}
+
+export const verifyCode = async (req, res) => {
+    const { code, userId } = req.body;
+    try {
+        const group = await Group.findOne({ code: code });
+        if (!group) {
+            return res.status(400).json({ error: "Invalid code" });
+        }
+        if(group.members.includes(userId)) {
+            return res.status(400).json({ error: "User already in group" });
+        }
+        group.members.push(userId);
+        group.save();
+        res.status(200).json({group, message: "User added to group successfully"});
     }
     catch (error) {
         res.status(404).json({ error: error.message });

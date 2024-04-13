@@ -115,9 +115,14 @@ const MyGroups = ({ navigation }) => {
                                     </Text>
                                 </View>
                             </View>
-                            <Text style={styles.timeText}>
-                                Dept Time: {formatTime(item.time)}
-                            </Text>
+                            <View style={{flexDirection: "row", justifyContent: "space-between", paddingRight: 10}}>
+                                <Text style={styles.timeText}>
+                                    Dept Time: {formatTime(item.time)}
+                                </Text>
+                                <Text style={{fontSize: 18, fontWeight: "bold"}}>
+                                    {item.code || "Not available"}
+                                </Text>
+                            </View>
                             <View style={styles.buttonContainer}>
                             <TouchableOpacity
                                 style={styles.viewButton}

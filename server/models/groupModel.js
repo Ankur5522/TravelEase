@@ -37,6 +37,10 @@ const groupSchema = new mongoose.Schema({
     chatRoomId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'ChatRoom'
+    },
+    code: {
+        type: String,
+        required: true
     }
 },{timestamps: true});
 

@@ -5,10 +5,15 @@ const userSlice = createSlice({
   name: 'user',
   initialState: {
     name: '',
-    email: '',
     loggedIn: false,
     loading: false,
     error: null
+  },
+  reducers: {
+    logout: (state) => {
+      state.name = '';
+      state.loggedIn = false;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -17,8 +22,7 @@ const userSlice = createSlice({
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        state.name = action.payload.name;
-        state.email = action.payload.email;
+        state.name = action.payload.user.name;
         state.loggedIn = true;
         state.loading = false;
       })
@@ -31,8 +35,7 @@ const userSlice = createSlice({
         state.error = null;
       })
       .addCase(signupUser.fulfilled, (state, action) => {
-        state.name = action.payload.name;
-        state.email = action.payload.email;
+        state.name = action.payload.user.name;
         state.loggedIn = true;
         state.loading = false;
       })
@@ -43,4 +46,5 @@ const userSlice = createSlice({
   },
 });
 
+export const { logout } = userSlice.actions;
 export default userSlice.reducer;

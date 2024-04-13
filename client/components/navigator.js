@@ -39,6 +39,8 @@ const TabNavigator = ({ networkError, setNetworkError }) => {
         const existingUser = await AsyncStorage.getItem("user");
         if (existingUser) {
           setUser(JSON.parse(existingUser));
+        } else {
+          setUser(null);
         }
       } catch (error) {
         console.error("Error fetching user:", error);

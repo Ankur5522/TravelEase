@@ -16,7 +16,7 @@ export const fetchGroups = createAsyncThunk("groups/fetchGroups", async () => {
         const response = await axiosInstance.get('/group/getGroups');
         return response.data;
     } catch (error) {
-        return error.response ? error.response.data : error.message;
+        throw error.response ? error.response.data : error.message;
     }
 })
 
@@ -25,7 +25,7 @@ export const createGroup = createAsyncThunk("groups/createGroup", async (group) 
         const response = await axiosInstance.post('/group/createGroup', group);
         return response.data;
     } catch (error) {
-        return error.response ? error.response.data : error.message;
+        throw error.response ? error.response.data : error.message;
     }
 })
 
@@ -37,7 +37,7 @@ export const deleteGroup = createAsyncThunk("groups/deleteGroup", async (id) => 
         }
         return;
     } catch (error) {
-        return error.response ? error.response.data : error.message;
+        throw error.response ? error.response.data : error.message;
     }
 })
 
@@ -48,7 +48,7 @@ export const addMemberToGroup = createAsyncThunk("groups/addMemberToGroup", asyn
             return { groupId, userId };
         }
     } catch (error) {
-        return error.response ? error.response.data : error.message;
+        throw error.response ? error.response.data : error.message;
     }
 })
 
@@ -59,7 +59,7 @@ export const removeMemberFromGroup = createAsyncThunk("groups/removeMemberFromGr
             return { groupId, userId };
         }
     } catch (error) {
-        return error.response ? error.response.data : error.message;
+        throw error.response ? error.response.data : error.message;
     }
 })
 
@@ -79,6 +79,16 @@ export const fetchMembers = async (id) => {
         const response = await axiosInstance.post(`/group/fetchMembers/${id}`);
         return response.data;
     } catch (error) {
-        return error.response ? error.response.data : error.message;
+        throw error.response ? error.response.data : error.message;
     }
 }
+
+export const verifyCode = createAsyncThunk("groups/verifyCode", async ({ code, userId }, { rejectWithValue }) => {
+    try {
+        const response = await axiosInstance.post('/group/verifyCode', { code, userId });
+        const {group} = response.data;
+        return {group, userId}
+    } catch (error) {
+        return rejectWithValue(error.response.data || 'An error occurred');
+    }
+});

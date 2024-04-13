@@ -66,20 +66,17 @@ const SignupScreen = () => {
                     code: otp,
                 })
                 .then(async (res) => {
-                    console.log(res)
                     const response = await dispatch(signupUser(formData));
-                    console.log("response",response)
                     if (response.error) {
                         alert(response.error);
                         return;
                     }
-                    const JSONvalue = JSON.stringify(response.user);
-                    console.log("JSONvalue", JSONvalue);
-                    // await AsyncStorage.setItem("user", JSONvalue);
+                    const JSONvalue = JSON.stringify(response.payload.user);
+                    await AsyncStorage.setItem("user", JSONvalue);
                     await setActive({ session: signUp.createdSessionId });
                 });
         } catch (error) {
-            console.error("Error verifying OTP:", error);
+            alert("Error verifying OTP:", error);
         }
     };
 
