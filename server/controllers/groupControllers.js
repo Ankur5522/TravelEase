@@ -3,7 +3,7 @@ import User from "../models/userModel.js"
 
 export const getGroups = async (req, res) => {
     try {
-        const groups = await Group.find();
+        const groups = await Group.find().sort({ createdAt: -1 });
         res.status(200).json(groups);
     } catch (error) {
         res.status(404).json({ error: error.message });
@@ -141,6 +141,7 @@ export const verifyCode = async (req, res) => {
             return res.status(400).json({ error: "User already in group" });
         }
         group.members.push(userId);
+        group.seatVacant = group.seatVacant - 1;
         group.save();
         res.status(200).json({group, message: "User added to group successfully"});
     }

@@ -9,6 +9,7 @@ import Constants from "expo-constants";
 import { ClerkProvider } from "@clerk/clerk-expo";
 import NetInfo from "@react-native-community/netinfo";
 import { useState, useEffect } from "react";
+import SplashScreen from "./screens/SplashScreen";
 
 const store = configureStore({
   reducer: {
@@ -27,9 +28,13 @@ export default function App() {
       } else {
         setNetworkError(false);
       }
-    })
-    unsubscribe();
+    });
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
+
   return (
     <ClerkProvider
       publishableKey={Constants.expoConfig.extra.clerkPublishableKey}
@@ -37,7 +42,13 @@ export default function App() {
       <NavigationContainer>
         <Provider store={store}>
           <View style={styles.container}>
-            <TabNavigator networkError={networkError} setNetworkError={setNetworkError}/>
+            <TabNavigator
+              networkError={networkError}
+              setNetworkError={setNetworkError}
+            />
+            {networkError && (
+              <Text style={styles.error}>Network connection error</Text>
+            )}
           </View>
         </Provider>
       </NavigationContainer>
@@ -52,7 +63,6 @@ const styles = StyleSheet.create({
   },
   error: {
     position: "absolute",
-    backgroundColor: "red",
     top: Constants.statusBarHeight + 15,
     left: 0,
     right: 0,
@@ -60,6 +70,6 @@ const styles = StyleSheet.create({
     color: "black",
     textAlign: "center",
     padding: 10,
-    zIndex: 999
+    zIndex: 999,
   },
 });

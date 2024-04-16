@@ -40,6 +40,7 @@ const ChatWindow = ({ route }) => {
         <View style={styles.container}>
             <View style={styles.headingContainer}>
                 <Text style={styles.headingText}>Group Chat</Text>
+                <Text style={{fontSize: 18, color: '#4c948c'}}></Text>
             </View>
             <View style={styles.membersContainer}>
                 <Text style={styles.memberText}>Members:</Text>

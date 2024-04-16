@@ -6,6 +6,7 @@ import {
     ImageBackground,
     FlatList,
     SafeAreaView,
+    RefreshControl,
 } from "react-native";
 import UserAvatar from "react-native-user-avatar";
 import TripCard from "./helpComponents/tripCard";
@@ -20,6 +21,7 @@ const Home = () => {
     const groupState = useSelector((state) => state.groups.groups);
     const [groups, setGroups] = useState([]);
     const [showJoinWindow, setShowJoinWindow] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const dispatch = useDispatch();
     const flatListRef = useRef();
 
@@ -38,11 +40,6 @@ const Home = () => {
                 });
         };
         fetchGroupsData();
-        groups.length &&
-            flatListRef.current?.scrollToIndex({
-                animated: true,
-                index: groups.length - 1,
-            });
         return () => {
             setGroups([]);
         };
@@ -56,12 +53,23 @@ const Home = () => {
             setGroups(filteredGroups);
         };
         setGroupsData();
-        groups.length &&
-            flatListRef.current?.scrollToIndex({
-                animated: true,
-                index: groups.length - 1,
-            });
     }, [groupState?.length, groupState]);
+
+    const fetchData = async () => {
+        setIsRefreshing(true);
+        dispatch(fetchGroups())
+            .unwrap()
+            .then((response) => {
+                const filteredGroups = response.filter(
+                    (group) => !group.confirmed
+                );
+                setGroups(filteredGroups);
+            })
+            .catch((error) => {
+                alert(error);
+            });
+        setIsRefreshing(false);
+    };
 
     return (
         <View style={styles.container}>
@@ -107,7 +115,12 @@ const Home = () => {
                         index,
                     })}
                     scrollsToTop={true}
-                    inverted={true}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={isRefreshing}
+                            onRefresh={fetchData}
+                        />
+                    }
                 />
             </SafeAreaView>
             <TouchableOpacity>
