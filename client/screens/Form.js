@@ -62,7 +62,7 @@ const Form = ({navigation}) => {
         ).unwrap().then((res) => {
             navigation.navigate('Trips');
         }).catch((err) => {
-            alert(err);
+            alert("Error Creating Group"+err.message);
         });
     };
 

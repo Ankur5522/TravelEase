@@ -4,8 +4,9 @@ import mongoose from 'mongoose';
 import "dotenv/config";
 import userRoutes from './routes/userRoutes.js';
 import groupRoutes from './routes/groupRoutes.js';
+import messageRoutes from './routes/messageRoutes.js';
+import {app,server} from './socket.js';
 
-const app = express();
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
@@ -24,9 +25,11 @@ db.once('open', () => {
 // Routes
 app.use('/user', userRoutes);
 app.use('/group', groupRoutes);
+app.use('/message',messageRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 3070;
-app.listen(PORT, () => {
+
+server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

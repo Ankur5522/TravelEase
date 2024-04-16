@@ -9,7 +9,8 @@ import {
     removeUserFromGroup,
     confirmGroup,
     fetchMembers,
-    verifyCode
+    verifyCode,
+    fetchChatId
 } from "../controllers/groupControllers.js";
 
 const router = express.Router();
@@ -24,5 +25,6 @@ router.post("/removeUserFromGroup/:id", removeUserFromGroup);
 router.post("/confirmGroup/:id", confirmGroup);
 router.post("/fetchMembers/:id", fetchMembers);
 router.post("/verifyCode", verifyCode)
+router.get("/fetchChatId/:id",fetchChatId);
 
 export default router;
