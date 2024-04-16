@@ -4,7 +4,7 @@ import ChatRoom  from "../models/chatRoomModel.js";
 
 export const getGroups = async (req, res) => {
     try {
-        const groups = await Group.find();
+        const groups = await Group.find().sort({ createdAt: -1 });
         res.status(200).json(groups);
     } catch (error) {
         res.status(404).json({ error: error.message });

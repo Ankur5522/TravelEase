@@ -33,7 +33,7 @@ const groupSlice = createSlice({
                 state.error = null;
             })
             .addCase(createGroup.fulfilled, (state, action) => {
-                state.groups.push(action.payload);
+                state.groups.unshift(action.payload);
                 state.error = null;
             })
             .addCase(createGroup.rejected, (state, action) => {
