@@ -83,6 +83,16 @@ export const fetchMembers = async (id) => {
     }
 }
 
+export const fetchChatId = async (id) => {
+    try {
+        const response = await axiosInstance.get(`/group/fetchChatId/${id}`);
+        return response.data;
+    } catch (error) {
+        throw error.response ? error.response.data : error.message;
+    }
+}
+
+
 export const verifyCode = createAsyncThunk("groups/verifyCode", async ({ code, userId }, { rejectWithValue }) => {
     try {
         const response = await axiosInstance.post('/group/verifyCode', { code, userId });

@@ -1,14 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, Platform } from 'react-native';
-import { fetchMembers } from '../actions/groupActions';
+import { fetchMembers,fetchChatId } from '../actions/groupActions';
 import { FontAwesome } from '@expo/vector-icons';
 import { Linking } from 'react-native';
+import axios from 'axios';
+import io from 'socket.io-client';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const baseURL = 'http://10.0.2.2:5000';
+
+const PORT = process.env.PORT || 3070;
+const socket = io(`http://10.0.2.2:${PORT}`);
+
+
 
 const ChatWindow = ({ route }) => {
     const [groupMembers, setGroupMembers] = useState([]);
+    const [ChatRoomId,setChatRoomId] = useState();
+    const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState('');
+    const [userId,setuserId] = useState();
     const { groupId } = route.params;
-
+   
     useEffect(() => {
         const fetchGroupMembers = async () => {
             try {
@@ -18,15 +31,93 @@ const ChatWindow = ({ route }) => {
                 console.error('Error fetching group members:', error);
             }
         };
+
+        const fetchChatRoomId = async () => {
+            try {
+                const response = await fetchChatId(groupId);
+                const chatRoomId = response.chatRoom_id;
+                console.log("chatRoomId", chatRoomId);
+                setChatRoomId(chatRoomId);
+
+
+                // await fetchChatMessages(ChatRoomId);
+
+                const JSONdata = await AsyncStorage.getItem("user");
+                const user = JSON.parse(JSONdata);
+                setuserId(user._id)
+        
+
+            } catch (error) {
+                console.error('Error fetching Chat Room Id:', error);
+            }
+        };
+
+
         fetchGroupMembers();
+        fetchChatRoomId();
+
+        socket.emit('joinChat', { ChatRoomId, user_Id: userId});
+       
     }, [groupId]);
 
-    const sendMessage = () => {
-        // Implement sending message logic here
-        console.log('Message sent:', message);
-        // Reset message input
-        setMessage('');
+    // const fetchChatMessages = async (chatRoomId) => {
+    //     try {
+    //         const response = await axios.get(`${baseURL}/message/${chatRoomId}`);
+    //         setMessages(response.data);
+    //     } catch (error) {
+    //         console.error('Error fetching chat messages:', error.message);
+    //     }
+    // };
+
+    useEffect(()=>{
+        // socket.emit('joinChat', { ChatRoomId, user_Id: userId });
+
+        socket.on('newMessage', (message) => {
+            console.log("messages",messages)
+            setMessages((prevMessages) => [...prevMessages, message]);
+        
+            flatListRef.current.scrollToEnd({ animated: true });
+          });
+
+          socket.on('userDisconnected', (userId) => {
+            console.log(`User ${userId} disconnected`);
+          });
+
+        return () => {
+            socket.emit('leaveChat', { ChatRoomId, userId: userId });
+            socket.off('newMessage');
+            socket.off('userDisconnected');
+        };
+    },[ChatRoomId])
+
+    const sendMessage = async () => {
+        try {
+            console.log("ChatId"+ChatRoomId);
+            console.log("SenderId"+userId);
+            console.log("message"+message);
+            await axios.post(`${baseURL}/message`, {
+                chatId: ChatRoomId, 
+                senderId: userId, 
+                text: message,
+            });
+
+
+            socket.emit('sendMessage', {
+                ChatRoomId,
+                userId,
+                text: message,
+              });
+
+            setMessage('');
+        } catch (error) {
+            console.error('Error sending message:', error);
+           
+        }
     };
+    
+    
+    
+    
 
     const handlePhoneCall = (phoneNumber) => {
         if(Platform.OS === 'android') {
@@ -75,8 +166,7 @@ const ChatWindow = ({ route }) => {
             </View>
         </View>
     );
-};
-
+    };
 export default ChatWindow;
 
 const styles = StyleSheet.create({
