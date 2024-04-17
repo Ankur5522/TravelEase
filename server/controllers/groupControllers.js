@@ -1,6 +1,5 @@
 import Group from "../models/groupModel.js"
 import User from "../models/userModel.js"
-import ChatRoom  from "../models/chatRoomModel.js";
 
 export const getGroups = async (req, res) => {
     try {

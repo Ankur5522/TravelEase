@@ -133,18 +133,24 @@ const MyGroups = ({ navigation }) => {
                                 <Text style={styles.buttonText}>View</Text>
                             </TouchableOpacity>
                                 {currentUser._id === item.ownerId &&
-                                    !item.confirmed && (
+                                    (!item.confirmed ? (
                                         <TouchableOpacity
                                             style={styles.confirmButton}
-                                            onPress={() =>
-                                                handleConfirm(item._id)
-                                            }
+                                            onPress={() => handleConfirm(item._id)}
                                         >
                                             <Text style={styles.buttonText}>
                                                 Confirm
                                             </Text>
-                                        </TouchableOpacity>
-                                    )}
+                                        </TouchableOpacity>)
+                                        : (
+                                            <TouchableOpacity 
+                                                style={styles.confirmButton}
+                                            >
+                                                <Text style={styles.buttonText}>Split</Text>
+                                            </TouchableOpacity>
+                                        )
+                                    )    
+                                }
                             </View>
                         </View>
                     )}
