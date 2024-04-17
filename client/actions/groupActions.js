@@ -76,16 +76,7 @@ export const confirmGroup = createAsyncThunk("groups/confirmGroup", async (id) =
 
 export const fetchMembers = async (id) => {
     try {
-        const response = await axiosInstance.post(`/group/fetchMembers/${id}`);
-        return response.data;
-    } catch (error) {
-        throw error.response ? error.response.data : error.message;
-    }
-}
-
-export const fetchChatId = async (id) => {
-    try {
-        const response = await axiosInstance.get(`/group/fetchChatId/${id}`);
+        const response = await axiosInstance.get(`/group/fetchMembers/${id}`);
         return response.data;
     } catch (error) {
         throw error.response ? error.response.data : error.message;
@@ -102,3 +93,22 @@ export const verifyCode = createAsyncThunk("groups/verifyCode", async ({ code, u
         return rejectWithValue(error.response.data || 'An error occurred');
     }
 });
+
+
+export const fetchChatMessages = async (groupId) => {
+    try {
+        const response = await axiosInstance.get(`/message/${groupId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching chat messages:', error.message);
+    }
+};
+
+export const sendNewMessage = async ({groupId, userId, message}) => {
+    try {
+        const response = await axiosInstance.post('/message', {groupId, userId, messageContent: message});
+        return response.data;
+    } catch (error) {
+        console.error('Error sending message:', error.message);
+    }
+}

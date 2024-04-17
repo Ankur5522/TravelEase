@@ -23,7 +23,7 @@ router.delete("/deleteGroup/:id", deleteGroup);
 router.post("/addUserToGroup/:id", addUsertoGroup);
 router.post("/removeUserFromGroup/:id", removeUserFromGroup);
 router.post("/confirmGroup/:id", confirmGroup);
-router.post("/fetchMembers/:id", fetchMembers);
+router.get("/fetchMembers/:id", fetchMembers);
 router.post("/verifyCode", verifyCode)
 router.get("/fetchChatId/:id",fetchChatId);
 

@@ -7,6 +7,6 @@ const router = express.Router();
 router.post('/', createMessage);
 
 // Get messages for a specific chat room
-router.get('/:chatId', getMessages);
+router.get('/:groupId', getMessages);
 
 export default router;

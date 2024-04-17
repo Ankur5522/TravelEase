@@ -127,7 +127,7 @@ const MyGroups = ({ navigation }) => {
                             <TouchableOpacity
                                 style={styles.viewButton}
                                 onPress={() =>
-                                    navigation.navigate("ChatWindow", { groupId: item._id })
+                                    navigation.navigate("ChatWindow", { groupId: item._id, userId: currentUser._id})
                                 }
                             >
                                 <Text style={styles.buttonText}>View</Text>
@@ -202,7 +202,7 @@ const MyGroups = ({ navigation }) => {
                                 <TouchableOpacity
                                     style={styles.viewButton}
                                     onPress={() =>
-                                        navigation.navigate("ChatWindow", {groupId: item._id})
+                                        navigation.navigate("ChatWindow", {groupId: item._id, userId: currentUser._id})
                                     }
                                 >
                                     <Text style={styles.buttonText}>View</Text>

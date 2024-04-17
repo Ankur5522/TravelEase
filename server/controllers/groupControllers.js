@@ -40,10 +40,6 @@ export const createGroup = async (req, res) => {
                 break;
             }
         } while (true);
-        
-        // const chatroom = await ChatRoom.create({ participants: [group.user._id] });  
-        // group.chatRoomId = chatroom._id;        
-        const chatRoom = await ChatRoom.create({ participants: [user._id] });
 
         const newGroup = new Group({
             ownerName: user.name,
@@ -53,7 +49,6 @@ export const createGroup = async (req, res) => {
             seatVacant: group.seatVacant,
             time: group.time,
             members: [user._id],
-            chatRoomId:chatRoom._id,
             code: code
         });
         await newGroup.save();
@@ -86,11 +81,6 @@ export const addUsertoGroup = async (req, res) => {
         group.members.push(user._id);
         group.seatVacant = group.seatVacant - 1;
         await group.save();
-        console.log("group.chatRoomId  "+group.chatRoomId)
-        const chatRoom = await ChatRoom.findById(group.chatRoomId);
-            chatRoom.participants.push(user._id);
-            await chatRoom.save();
-        
 
         res.status(200).json({message: "User added to group successfully"});
     }
@@ -111,12 +101,6 @@ export const removeUserFromGroup = async (req, res) => {
         group.members = group.members.filter(member => member.toString() !== userId.toString());
         group.seatVacant = group.seatVacant + 1;
         await group.save();
-
-        const chatRoom = await ChatRoom.findById(group.chatRoomId);
-        if (chatRoom) {
-            chatRoom.participants = chatRoom.participants.filter(participant => participant.toString() !== userId.toString());
-            await chatRoom.save();
-        }
 
         res.status(200).json({ message: "User removed from group successfully" });
     } catch (error) {
@@ -163,26 +147,6 @@ export const fetchChatId = async (req, res) => {
     }
 };
 
-
-// export const verifyCode = async (req, res) => {
-//     const { code, userId } = req.body;
-//     try {
-//         const group = await Group.findOne({ code: code });
-//         if (!group) {
-//             return res.status(400).json({ error: "Invalid code" });
-//         }
-//         if(group.members.includes(userId)) {
-//             return res.status(400).json({ error: "User already in group" });
-//         }
-//         group.members.push(userId);
-//         group.save();
-//         res.status(200).json({group, message: "User added to group successfully"});
-//     }
-//     catch (error) {
-//         res.status(404).json({ error: error.message });
-//     }
-// }
-
 export const verifyCode = async (req, res) => {
     const { code, userId } = req.body;
     try {
@@ -190,25 +154,14 @@ export const verifyCode = async (req, res) => {
         if (!group) {
             return res.status(400).json({ error: "Invalid code" });
         }
-        if (group.members.includes(userId)) {
+        if(group.members.includes(userId)) {
             return res.status(400).json({ error: "User already in group" });
         }
-        
         group.members.push(userId);
-        await group.save();
-
-        const chatRoomId = group.chatRoomId;
-        
-        const chatRoom = await ChatRoom.findById(chatRoomId);
-        if (!chatRoom) {
-            return res.status(404).json({ error: "Chat room not found" });
-        }
-
-        chatRoom.participants.push(userId);
-        await chatRoom.save();
-
-        res.status(200).json({ group, message: "User added to group successfully" });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+        group.save();
+        res.status(200).json({group, message: "User added to group successfully"});
     }
-};
+    catch (error) {
+        res.status(404).json({ error: error.message });
+    }
+}

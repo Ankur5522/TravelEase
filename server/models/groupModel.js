@@ -41,7 +41,12 @@ const groupSchema = new mongoose.Schema({
     code: {
         type: String,
         required: true
-    }
+    },
+    messages: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Message',
+        default: []
+    }]
 },{timestamps: true});
 
 const Group = mongoose.model('Group', groupSchema);

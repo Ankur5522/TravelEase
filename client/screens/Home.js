@@ -55,7 +55,7 @@ const Home = () => {
         setGroupsData();
     }, [groupState?.length, groupState]);
 
-    const fetchData = async () => {
+    const fetchData = () => {
         setIsRefreshing(true);
         dispatch(fetchGroups())
             .unwrap()
