@@ -112,3 +112,12 @@ export const sendNewMessage = async ({groupId, userId, message}) => {
         console.error('Error sending message:', error.message);
     }
 }
+
+export const splitAmount = createAsyncThunk("groups/splitAmount", async ({ amount, userId, groupId }) => {
+    try {
+        const response = await axiosInstance.post('/group/splitAmount', { amount, userId, groupId });
+        return response.data.details;
+    } catch (error) {
+        throw error.response ? error.response.data : error.message;
+    }
+})

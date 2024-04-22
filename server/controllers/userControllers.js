@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import User from '../models/userModel.js';
+import Transaction from '../models/transactionModel.js';
 
 export const loginUser = async (req, res) => {
     const { phoneNumber, password } = req.body;
@@ -52,5 +53,40 @@ export const signupUser = async (req, res) => {
     } catch (error) {
       console.error('Signup error:', error);
       res.status(500).json({error: 'Internal server error' });
+    }
+  }
+
+export const fetchUser = async (req, res) => {
+    const { userId } = req.params;
+  
+    try {
+      const user = await User.findById(userId).populate('transactions');
+      if (!user) {
+        return res.status(400).json({ error: 'User not found' });
+      }
+      res.status(200).json({ user });
+    } catch (error) {
+      console.error('Fetch user error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+export const settleAmount = async (req, res) => {
+    const { receiverId, transactionId } = req.body;
+    try {
+      const transaction = await Transaction.findById(transactionId)
+      if (!transaction) {
+        return res.status(400).json({ error: 'Transaction not found' });
+      }
+      transaction.receivers.forEach(async (receiver) => {
+        if (receiver.receiverId.toString() === receiverId) {
+          receiver.settled = true;
+        }
+      });
+      await transaction.save();
+      res.status(200).json({ message: 'Amount settled successfully' });
+    } catch (error) {
+      console.error('Settle amount error:', error);
+      res.status(500).json({ error: 'Internal server error' });
     }
   }

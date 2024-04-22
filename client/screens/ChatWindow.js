@@ -131,6 +131,11 @@ const ChatWindow = ({ route }) => {
                             }}
                         >
                             <View>
+                            <Text style={{paddingHorizontal: 5}}>
+                                {item.sender !== userId &&
+                                    groupMembers.find((member) => member._id === item.sender)?.name
+                                }
+                            </Text>
                             <Text
                                 style={{
                                     backgroundColor:
@@ -153,11 +158,6 @@ const ChatWindow = ({ route }) => {
                                 {formatTime(item.createdAt)}
                             </Text>
                             </View>
-                            <Text>
-                                {item.sender !== userId &&
-                                    groupMembers.find((member) => member._id === item.sender).name
-                                }
-                            </Text>
                         </View>
                     )}
                     onLayout={() => flatListRef.current.scrollToEnd({ animated: true })}

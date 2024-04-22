@@ -41,3 +41,21 @@ export const signupUser = createAsyncThunk('user/signup', async (userData) => {
         return error.response ? error.response.data : error.message;
     }
 });
+
+export const fetchUserDetails = async (userId) => {
+    try {
+        const response = await axiosInstance.get(`user/fetchUser/${userId}`);
+        return response.data;
+    } catch (error) {
+        return error.response.data;
+    }
+}
+
+export const settleAmount = async ({receiverId, transactionId}) => {
+    try {
+        const response = await axiosInstance.post(`user/settleAmount`, {receiverId, transactionId});
+        return response.data;
+    } catch (error) {
+        return error.response.data;
+    }
+}

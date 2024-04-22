@@ -1,3 +1,5 @@
+// have to move current group to past group on basis of split confirmation
+
 import React, { useEffect, useState } from "react";
 import {
     View,
@@ -5,7 +7,6 @@ import {
     StyleSheet,
     FlatList,
     TouchableOpacity,
-    Button,
 } from "react-native";
 import { useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -13,12 +14,18 @@ import { EvilIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { confirmGroup } from "../actions/groupActions";
 import { useDispatch } from "react-redux";
+import SettleWindow from "./helpComponents/settleWindow";
 
 const MyGroups = ({ navigation }) => {
     const groups = useSelector((state) => state.groups.groups);
     const [currentGroups, setCurrentGroups] = useState([]);
     const [pastGroups, setPastGroups] = useState([]);
     const [currentUser, setCurrentUser] = useState({});
+    const [showSettleWindow, setShowSettleWindow] = useState(false);
+    const [pressedDetails, setPressedDetails] = useState({
+        groupId: "",
+        userId: "",
+    });
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -69,8 +76,22 @@ const MyGroups = ({ navigation }) => {
             });
     };
 
+    const handleSplitPress = ({ groupId, userId }) => {
+        setPressedDetails({ groupId, userId });
+        setShowSettleWindow(true);
+    };
+
     return (
         <View style={styles.container}>
+            {showSettleWindow && (
+                <View style={styles.settleWindowContainer}>
+                    <SettleWindow
+                        setShowSettleWindow={setShowSettleWindow}
+                        groupId={pressedDetails.groupId}
+                        userId={pressedDetails.userId}
+                    />
+                </View>
+            )}
             <Text style={styles.heading}>My Groups</Text>
             <View style={styles.currentGroupContainer}>
                 <Text style={styles.currentText}>Current Groups</Text>
@@ -115,42 +136,60 @@ const MyGroups = ({ navigation }) => {
                                     </Text>
                                 </View>
                             </View>
-                            <View style={{flexDirection: "row", justifyContent: "space-between", paddingRight: 10}}>
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    justifyContent: "space-between",
+                                    paddingRight: 10,
+                                }}
+                            >
                                 <Text style={styles.timeText}>
                                     Dept Time: {formatTime(item.time)}
                                 </Text>
-                                <Text style={{fontSize: 18, fontWeight: "bold"}}>
+                                <Text
+                                    style={{ fontSize: 18, fontWeight: "bold" }}
+                                >
                                     {item.code || "Not available"}
                                 </Text>
                             </View>
                             <View style={styles.buttonContainer}>
-                            <TouchableOpacity
-                                style={styles.viewButton}
-                                onPress={() =>
-                                    navigation.navigate("ChatWindow", { groupId: item._id, userId: currentUser._id})
-                                }
-                            >
-                                <Text style={styles.buttonText}>View</Text>
-                            </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.viewButton}
+                                    onPress={() =>
+                                        navigation.navigate("ChatWindow", {
+                                            groupId: item._id,
+                                            userId: currentUser._id,
+                                        })
+                                    }
+                                >
+                                    <Text style={styles.buttonText}>View</Text>
+                                </TouchableOpacity>
                                 {currentUser._id === item.ownerId &&
-                                    (!item.confirmed ? (
+                                    !item.confirmed && (
                                         <TouchableOpacity
                                             style={styles.confirmButton}
-                                            onPress={() => handleConfirm(item._id)}
+                                            onPress={() =>
+                                                handleConfirm(item._id)
+                                            }
                                         >
                                             <Text style={styles.buttonText}>
                                                 Confirm
                                             </Text>
-                                        </TouchableOpacity>)
-                                        : (
-                                            <TouchableOpacity 
-                                                style={styles.confirmButton}
-                                            >
-                                                <Text style={styles.buttonText}>Split</Text>
-                                            </TouchableOpacity>
-                                        )
-                                    )    
-                                }
+                                        </TouchableOpacity>
+                                    )}
+                                {item.confirmed && (
+                                    <TouchableOpacity
+                                        style={styles.confirmButton}
+                                        onPress={() => handleSplitPress({
+                                            groupId: item._id,
+                                            userId: currentUser._id,
+                                        })}
+                                    >
+                                        <Text style={styles.buttonText}>
+                                            Split
+                                        </Text>
+                                    </TouchableOpacity>
+                                )}
                             </View>
                         </View>
                     )}
@@ -208,7 +247,10 @@ const MyGroups = ({ navigation }) => {
                                 <TouchableOpacity
                                     style={styles.viewButton}
                                     onPress={() =>
-                                        navigation.navigate("ChatWindow", {groupId: item._id, userId: currentUser._id})
+                                        navigation.navigate("ChatWindow", {
+                                            groupId: item._id,
+                                            userId: currentUser._id,
+                                        })
                                     }
                                 >
                                     <Text style={styles.buttonText}>View</Text>
@@ -230,6 +272,17 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 10,
+    },
+    settleWindowContainer: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        zIndex: 999,
+        justifyContent: "center",
+        alignItems: "center",
     },
     heading: {
         fontSize: 28,

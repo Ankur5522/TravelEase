@@ -21,7 +21,11 @@ const userSchema = new mongoose.Schema({
     groups: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Group'
-    }]
+    }],
+    transactions: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Transaction'
+    }],
 }, {timestamps: true});
 
 const User = mongoose.model('User', userSchema);

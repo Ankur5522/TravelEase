@@ -42,7 +42,11 @@ const groupSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Message',
         default: []
-    }]
+    }],
+    transactionId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Transaction',
+    }
 },{timestamps: true});
 
 const Group = mongoose.model('Group', groupSchema);

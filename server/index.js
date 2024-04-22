@@ -7,7 +7,6 @@ import groupRoutes from './routes/groupRoutes.js';
 import messageRoutes from './routes/messageRoutes.js';
 import {app,server} from './socket.js';
 
-
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

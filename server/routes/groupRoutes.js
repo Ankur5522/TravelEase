@@ -10,7 +10,8 @@ import {
     confirmGroup,
     fetchMembers,
     verifyCode,
-    fetchChatId
+    fetchChatId,
+    splitAmount
 } from "../controllers/groupControllers.js";
 
 const router = express.Router();
@@ -26,5 +27,6 @@ router.post("/confirmGroup/:id", confirmGroup);
 router.get("/fetchMembers/:id", fetchMembers);
 router.post("/verifyCode", verifyCode)
 router.get("/fetchChatId/:id",fetchChatId);
+router.post("/splitAmount", splitAmount);
 
 export default router;

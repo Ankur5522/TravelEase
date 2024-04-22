@@ -7,6 +7,7 @@ import {
     removeMemberFromGroup,
     confirmGroup,
     verifyCode,
+    splitAmount
 } from "../actions/groupActions";
 
 const initialState = {
@@ -133,9 +134,27 @@ const groupSlice = createSlice({
             })
             .addCase(verifyCode.rejected, (state, action) => {
                 state.error = action.error.message;
+            })
+            .addCase(splitAmount.pending, (state) => {
+                state.error = null;
+            })
+            .addCase(splitAmount.fulfilled, (state, action) => {
+                const { groupId, transactionId } = action.payload;
+                const groupIndex = state.groups.findIndex(
+                    (grp) => grp._id === groupId
+                );
+                if (groupIndex !== -1) {
+                    const updatedGroup = {
+                        ...state.groups[groupIndex],
+                        transactionId: transactionId,
+                    };
+                    state.groups[groupIndex] = updatedGroup;
+                }
+                state.error = null;
+            })
+            .addCase(splitAmount.rejected, (state, action) => {
+                state.error = action.error.message;
             });
-
-
     },
 });
 
