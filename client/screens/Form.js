@@ -22,7 +22,7 @@ import { createGroup } from "../actions/groupActions";
 import { useDispatch } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Form = ({navigation}) => {
+const Form = ({ navigation }) => {
     const [date, setDate] = useState(new Date());
     const [formData, setFormData] = useState({
         from: "",
@@ -57,13 +57,14 @@ const Form = ({navigation}) => {
         const JSONdata = await AsyncStorage.getItem("user");
         const user = JSON.parse(JSONdata);
         formData.owner = user._id;
-        dispatch(
-            createGroup({ ...formData, owner: user._id })
-        ).unwrap().then((res) => {
-            navigation.navigate('Trips');
-        }).catch((err) => {
-            alert("Error Creating Group"+err.message);
-        });
+        dispatch(createGroup({ ...formData, owner: user._id }))
+            .unwrap()
+            .then((res) => {
+                navigation.navigate("Trips");
+            })
+            .catch((err) => {
+                alert("Error Creating Group" + err.message);
+            });
     };
 
     return (
@@ -71,7 +72,7 @@ const Form = ({navigation}) => {
             <View style={styles.upperPart}>
                 <ImageBackground
                     source={upperPartBg}
-                    style={{ width: "110%", height: "100%" }}
+                    style={{ width: "110%", minHeight: "35%"}}
                 >
                     <View style={styles.upperFormContainer}>
                         <Text style={styles.upperTextName}>Hi Name</Text>
@@ -124,147 +125,145 @@ const Form = ({navigation}) => {
                         </View>
                     </View>
                 </ImageBackground>
-            </View>
             <View style={styles.lowerPart}>
-                <View style={styles.selectedContent}>
+                <View
+                    style={[
+                        styles.timeContainer,
+                        {
+                            borderBottomWidth: 1,
+                            borderBottomColor: "#D8D8D84F",
+                        },
+                    ]}
+                >
                     <View
-                        style={[
-                            styles.timeContainer,
-                            {
-                                borderBottomWidth: 1,
-                                borderBottomColor: "#D8D8D84F",
-                            },
-                        ]}
+                        style={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                        }}
                     >
-                        <View
-                            style={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                            }}
-                        >
-                            <MaterialIcons
-                                name="access-time"
-                                size={32}
-                                color="black"
-                            />
-                            <Text
-                                style={{
-                                    marginLeft: 5,
-                                    fontSize: 18,
-                                    fontWeight: "bold",
-                                }}
-                            >
-                                Time
-                            </Text>
-                        </View>
-                        {show && (
-                            <DateTimePicker
-                                value={date}
-                                mode="time"
-                                is24Hour={true}
-                                display="spinner"
-                                onChange={onChange}
-                            />
-                        )}
+                        <MaterialIcons
+                            name="access-time"
+                            size={32}
+                            color="black"
+                        />
                         <Text
-                            onPress={() => setShow(true)}
                             style={{
-                                fontSize: 16,
+                                marginLeft: 5,
+                                fontSize: 18,
                                 fontWeight: "bold",
                             }}
                         >
-                            {date.toLocaleTimeString()}
+                            Time
                         </Text>
                     </View>
-                    <View style={styles.timeContainer}>
-                        <View
-                            style={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                            }}
-                        >
-                            <MaterialCommunityIcons
-                                name="account-outline"
-                                size={34}
-                                color="black"
-                            />
-                            <Text
-                                style={{
-                                    marginLeft: 5,
-                                    fontSize: 18,
-                                    fontWeight: "bold",
-                                }}
-                            >
-                                Seats Vacant
-                            </Text>
-                        </View>
-                        <View
-                            style={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                            }}
-                        >
-                            <Entypo
-                                name="minus"
-                                size={28}
-                                color="black"
-                                onPress={() => {
-                                    setFormData({
-                                        ...formData,
-                                        seatVacant:
-                                            formData.seatVacant > 0
-                                                ? formData.seatVacant - 1
-                                                : 0,
-                                    });
-                                }}
-                            />
-                            <TextInput
-                                style={{
-                                    fontSize: 22,
-                                    textAlign: "center",
-                                    fontWeight: "bold",
-                                    marginHorizontal: 3,
-                                }}
-                                value={formData.seatVacant.toString()}
-                                onChangeText={(value) => {
-                                    if (!isNaN(value)) {
-                                        setFormData({
-                                            ...formData,
-                                            seatVacant: parseInt(value),
-                                        });
-                                    }
-                                }}
-                                keyboardType="numeric"
-                            />
-                            <Entypo
-                                name="plus"
-                                size={28}
-                                color="black"
-                                onPress={() =>
-                                    setFormData({
-                                        ...formData,
-                                        seatVacant: formData.seatVacant + 1,
-                                    })
-                                }
-                            />
-                        </View>
-                    </View>
-                    <TouchableOpacity onPress={handleSubmit}>
-                        <View style={styles.offerRideButton}>
-                            <Text
-                                style={{
-                                    color: "white",
-                                    fontSize: 18,
-                                    fontWeight: "bold",
-                                    marginRight: 10,
-                                }}
-                            >
-                                Offer Ride
-                            </Text>
-                            <AntDesign name="right" size={18} color="white" />
-                        </View>
-                    </TouchableOpacity>
+                    {show && (
+                        <DateTimePicker
+                            value={date}
+                            mode="time"
+                            is24Hour={true}
+                            display="spinner"
+                            onChange={onChange}
+                        />
+                    )}
+                    <Text
+                        onPress={() => setShow(true)}
+                        style={{
+                            fontSize: 16,
+                            fontWeight: "bold",
+                        }}
+                    >
+                        {date.toLocaleTimeString()}
+                    </Text>
                 </View>
+                <View style={styles.timeContainer}>
+                    <View
+                        style={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                        }}
+                    >
+                        <MaterialCommunityIcons
+                            name="account-outline"
+                            size={34}
+                            color="black"
+                        />
+                        <Text
+                            style={{
+                                marginLeft: 5,
+                                fontSize: 18,
+                                fontWeight: "bold",
+                            }}
+                        >
+                            Seats Vacant
+                        </Text>
+                    </View>
+                    <View
+                        style={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                        }}
+                    >
+                        <Entypo
+                            name="minus"
+                            size={28}
+                            color="black"
+                            onPress={() => {
+                                setFormData({
+                                    ...formData,
+                                    seatVacant:
+                                        formData.seatVacant > 0
+                                            ? formData.seatVacant - 1
+                                            : 0,
+                                });
+                            }}
+                        />
+                        <TextInput
+                            style={{
+                                fontSize: 22,
+                                textAlign: "center",
+                                fontWeight: "bold",
+                                marginHorizontal: 3,
+                            }}
+                            value={formData.seatVacant.toString()}
+                            onChangeText={(value) => {
+                                if (!isNaN(value)) {
+                                    setFormData({
+                                        ...formData,
+                                        seatVacant: parseInt(value),
+                                    });
+                                }
+                            }}
+                            keyboardType="numeric"
+                        />
+                        <Entypo
+                            name="plus"
+                            size={28}
+                            color="black"
+                            onPress={() =>
+                                setFormData({
+                                    ...formData,
+                                    seatVacant: formData.seatVacant + 1,
+                                })
+                            }
+                        />
+                    </View>
+                </View>
+                <TouchableOpacity onPress={handleSubmit}>
+                    <View style={styles.offerRideButton}>
+                        <Text
+                            style={{
+                                color: "white",
+                                fontSize: 18,
+                                fontWeight: "bold",
+                                marginRight: 10,
+                            }}
+                        >
+                            Offer Ride
+                        </Text>
+                        <AntDesign name="right" size={18} color="white" />
+                    </View>
+                </TouchableOpacity>
+            </View>
             </View>
         </View>
     );
@@ -277,6 +276,10 @@ const styles = StyleSheet.create({
     upperPart: {
         flex: 1,
         backgroundColor: "lightblue",
+        position: "fixed",
+        zIndex: 999,
+        minHeight: "33%",
+        maxHeight: "33%",
     },
     upperFormContainer: {
         marginTop: 30,
@@ -308,7 +311,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     lowerPart: {
-        flex: 2,
         justifyContent: "flex-start",
     },
     optionContainer: {
@@ -322,20 +324,6 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: "black",
     },
-    selectedOption: {
-        fontWeight: "bold",
-    },
-    slider: {
-        position: "absolute",
-        bottom: 1,
-        width: "50%",
-        height: 3,
-        backgroundColor: "#858585",
-    },
-    selectedContent: {
-        backgroundColor: "white",
-        height: "100%",
-    },
     timeContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
@@ -343,6 +331,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 30,
         height: 60,
         marginTop: 10,
+        position: "fixed",
     },
     offerRideButton: {
         flexDirection: "row",

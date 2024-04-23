@@ -55,7 +55,6 @@ const Transactions = () => {
                         });
                     }
                 } else {
-                    // Sender is not the current user
                     const receiverDetails = await fetchUserDetails(
                         transaction.senderId
                     );
@@ -104,7 +103,7 @@ const Transactions = () => {
         if (response && response.message) {
             setTransactionDetails(prevDetails => prevDetails.map(transaction => {
                 if (transaction._id === receiverId) {
-                    return { ...transaction, settled: true };
+                    return { ...transaction, settled: true, updatedAt: formatTime(Date.now()).time};
                 }
                 return transaction;
             }));
@@ -173,6 +172,7 @@ const Transactions = () => {
                                 item.settled ? (
                                     <Text style={{fontSize: 16, color: "gray"}}>
                                         Settled
+                                        {item.updatedAt && ` at ${item.updatedAt}`}
                                     </Text>
                                 ) : (
                                     <TouchableOpacity
@@ -186,7 +186,9 @@ const Transactions = () => {
                             )}
                             {item.sender !== "You" && (
                                 item.settled ? (
-                                  <Text style={{fontSize: 16, color: "gray"}}>Settled</Text>
+                                  <Text style={{fontSize: 16, color: "gray"}}>Settled
+                                    {item.updatedAt && ` at ${item.updatedAt}`}
+                                  </Text>
                                 ) : (
                                   <Text style={{fontSize: 16, color: "red"}}>Unsettled</Text>
                                 )

@@ -84,7 +84,6 @@ const ChatWindow = ({ route }) => {
         <View style={styles.container}>
             <View style={styles.headingContainer}>
                 <Text style={styles.headingText}>Group Chat</Text>
-                <Text style={{ fontSize: 18, color: "#4c948c" }}></Text>
             </View>
             <View style={styles.membersContainer}>
                 <Text style={styles.memberText}>Members:</Text>
@@ -96,6 +95,7 @@ const ChatWindow = ({ route }) => {
                             style={{
                                 flexDirection: "row",
                                 justifyContent: "space-between",
+                                marginBottom: 5,
                             }}
                         >
                             <Text style={{ fontSize: 18 }}>
@@ -187,20 +187,22 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
+        paddingBottom: 50
     },
     headingContainer: {
         alignItems: "center",
-        paddingVertical: 20,
+        paddingVertical: 18,
         borderBottomWidth: 1,
         borderBottomColor: "#ccc",
     },
     headingText: {
-        fontSize: 24,
+        fontSize: 26,
         fontWeight: "bold",
     },
     membersContainer: {
         flex: 1,
-        padding: 20,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
         borderBottomWidth: 1,
         borderBottomColor: "#ccc",
     },

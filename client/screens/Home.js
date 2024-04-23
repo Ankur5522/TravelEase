@@ -104,6 +104,13 @@ const Home = () => {
                 </View>
             </ImageBackground>
             <SafeAreaView style={styles.tripsContainer}>
+                
+            {groups.length === 0 && (
+                <View style={styles.emptyTextContainer}>
+                    <Text style={styles.emptyTextMain}>No Groups requests right now.</Text>
+                    <Text style={styles.emptytextSecondary}>CLick to plus button below to create a new group.</Text>
+                </View>
+            )}
                 <FlatList
                     ref={flatListRef}
                     data={groups}
@@ -128,7 +135,7 @@ const Home = () => {
                     <AntDesign
                         name="pluscircle"
                         size={60}
-                        color="#4c948c"
+                        color="#1A4D2E"
                         style={styles.formButton}
                     />
                 </Link>
@@ -153,6 +160,21 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "rgba(0, 0, 0, 0.7)",
     },
+    emptyTextContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    emptyTextMain: {
+        fontSize: 24,
+        fontWeight: "bold",
+        color: "white",
+    },
+    emptytextSecondary: {
+        fontSize: 16,
+        fontWeight: "600",
+        color: "white",
+    },
     headingContainer: {
         flex: 0.5,
         justifyContent: "center",
@@ -160,7 +182,7 @@ const styles = StyleSheet.create({
     },
     avatarContainer: {
         position: "absolute",
-        top: 14,
+        top: 16,
         left: 10,
     },
     headingText: {
@@ -191,14 +213,12 @@ const styles = StyleSheet.create({
     },
     formButtonContainer: {
         position: "absolute",
-        bottom: 10,
-        right: 15,
+        bottom: 70,
+        right: 20,
     },
     formButton: {
         position: "absolute",
-        bottom: 15,
-        right: 15,
-        borderRadius: 30,
+        borderRadius: 10,
         zIndex: 10,
     },
 });
