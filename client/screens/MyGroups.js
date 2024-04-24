@@ -38,11 +38,7 @@ const MyGroups = ({ navigation }) => {
                 group.members.includes(user._id)
             );
             const currentGroups = userGroups?.filter((group) => {
-                const confirmationTime = new Date(group.time);
-                const timeDifference =
-                    currentTime.getTime() - confirmationTime.getTime();
-                const hoursDifference = timeDifference / (1000 * 60 * 60);
-                return hoursDifference < 1;
+                return group.transactionId  === null
             });
             const pastGroups = userGroups?.filter(
                 (group) => !currentGroups.includes(group) && group.confirmed

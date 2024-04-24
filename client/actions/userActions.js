@@ -59,3 +59,12 @@ export const settleAmount = async ({receiverId, transactionId}) => {
         return error.response.data;
     }
 }
+
+export const enterUpi = async ({upi, userId}) => {
+    try {
+        const response = await axiosInstance.post(`user/enterUpi`, {upi, userId});
+        return response.data;
+    } catch (error) {
+        return error.response.data;
+    }
+}

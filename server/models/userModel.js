@@ -14,10 +14,6 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    friends: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    }],
     groups: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Group'
@@ -26,6 +22,10 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Transaction'
     }],
+    upi: {
+        type: String,
+        default: ''
+    }
 }, {timestamps: true});
 
 const User = mongoose.model('User', userSchema);

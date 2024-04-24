@@ -59,7 +59,7 @@ const TabNavigator = ({ networkError, setNetworkError }) => {
   return (
     <View style={{ flex: 1 }}>
       <ErrorModal visible={networkError} onClose={() => setNetworkError(false)} />
-      {user ? <BottomTabNavigator /> : <AuthStack />}
+      {user  ? <BottomTabNavigator /> : <AuthStack />}
     </View>
   );
 };

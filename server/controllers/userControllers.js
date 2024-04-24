@@ -90,3 +90,19 @@ export const settleAmount = async (req, res) => {
       res.status(500).json({ error: 'Internal server error' });
     }
   }
+
+  export const enterUpi = async (req, res) => {
+    const { upi, userId } = req.body;
+    try {
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(400).json({ error: 'User not found' });
+      } 
+      user.upi = upi;
+      await user.save();
+      res.status(200).json({ message: 'UPI ID added successfully' });
+    } catch (error) {
+      console.error('Enter UPI error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }

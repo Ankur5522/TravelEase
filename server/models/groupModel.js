@@ -46,6 +46,7 @@ const groupSchema = new mongoose.Schema({
     transactionId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Transaction',
+        default: null
     }
 },{timestamps: true});
 

@@ -23,7 +23,6 @@ const SettleWindow = ({ setShowSettleWindow, userId, groupId }) => {
         dispatch(splitAmount({ amount, userId, groupId }))
             .unwrap()
             .then((res) => {
-                console.log('res', res)
                 setShowSettleWindow(false);
             })
             .catch((error) => {
