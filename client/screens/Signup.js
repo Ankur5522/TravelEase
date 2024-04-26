@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
     View,
     Text,
@@ -21,20 +21,17 @@ const SignupScreen = () => {
         confirmPassword: "",
     });
     const { signUp, setActive } = useSignUp();
-    const [otp, setOtp] = useState("");
-    const [otpSent, setOtpSent] = useState(false);
+    const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+    const [otpVisible, setOtpVisible] = useState(false);
     const [error, setError] = useState(null);
     const dispatch = useDispatch();
+    const otpInputs = useRef([]);
 
     const handleInputChange = (field, value) => {
         setFormData({
             ...formData,
             [field]: value,
         });
-    };
-
-    const handleSignup = () => {
-        const response = handleSendOTP(formData.phoneNumber);
     };
 
     const handleSendOTP = async (phoneNo) => {
@@ -53,7 +50,7 @@ const SignupScreen = () => {
                 phoneNumber: `+91${phoneNo}`,
             });
             await signUp.preparePhoneNumberVerification();
-            setOtpSent(!otpSent);
+            setOtpVisible(true);
         } catch (error) {
             console.error("Error sending OTP:", error);
         }
@@ -61,26 +58,37 @@ const SignupScreen = () => {
 
     const handleVerifyOTP = async () => {
         try {
-            await signUp
-                .attemptPhoneNumberVerification({
-                    code: otp,
-                })
-                .then(async (res) => {
-                    const response = await dispatch(signupUser(formData));
-                    if (response.error) {
-                        alert(response.error);
-                        return;
-                    }
-                    const JSONvalue = JSON.stringify(response.payload.user);
-                    await AsyncStorage.setItem("user", JSONvalue);
-                    await setActive({ session: signUp.createdSessionId });
-                });
+            const newOtp = otp.join("");
+            await signUp.attemptPhoneNumberVerification({
+                code: newOtp,
+            }).then(async (res) => {
+                const response = await dispatch(signupUser(formData));
+                if (response.error) {
+                    alert(response.error);
+                    return;
+                }
+                const JSONvalue = JSON.stringify(response.payload.user);
+                await AsyncStorage.setItem("user", JSONvalue);
+                await setActive({ session: signUp.createdSessionId });
+            }).catch((error) => {
+                setError("Invalid OTP");
+            });
         } catch (error) {
-            alert("Error verifying OTP:", error);
+            console.error("Error verifying OTP:", error);
         }
     };
 
-    return !otpSent ? (
+    const handleChangeOtp = (index, value) => {
+        const newOtp = [...otp];
+        newOtp[index] = value;
+        setOtp(newOtp);
+        // If value is entered and there are more OTP inputs, focus on the next input
+        if (value && index < otpInputs.current.length - 1) {
+            otpInputs.current[index + 1].focus();
+        }
+    };
+
+    return (
         <View style={styles.container}>
             <View style={styles.header}>
                 <Text style={styles.welcomeText}>Hello!! Register here to</Text>
@@ -96,9 +104,7 @@ const SignupScreen = () => {
             <TextInput
                 style={styles.input}
                 placeholder="Enter your phone number"
-                onChangeText={(value) =>
-                    handleInputChange("phoneNumber", value)
-                }
+                onChangeText={(value) => handleInputChange("phoneNumber", value)}
                 value={formData.phoneNumber}
                 keyboardType="phone-pad"
             />
@@ -113,50 +119,44 @@ const SignupScreen = () => {
             <TextInput
                 style={styles.input}
                 placeholder="Confirm your password"
-                onChangeText={(value) =>
-                    handleInputChange("confirmPassword", value)
-                }
+                onChangeText={(value) => handleInputChange("confirmPassword", value)}
                 value={formData.confirmPassword}
                 secureTextEntry={true}
             />
 
-            <TouchableOpacity style={styles.button} onPress={handleSignup}>
-                <Text style={styles.buttonText}>Sign Up</Text>
+            {otpVisible && (
+                <View style={styles.otpContainer}>
+                    {[...Array(6)].map((_, index) => (
+                        <TextInput
+                            ref={(ref) => (otpInputs.current[index] = ref)}
+                            key={index}
+                            style={styles.otpInput}
+                            placeholder="•"
+                            maxLength={1}
+                            keyboardType="numeric"
+                            value={otp[index]}
+                            onChangeText={(text) => handleChangeOtp(index, text)}
+                        />
+                    ))}
+                </View>
+            )}
+
+            <TouchableOpacity style={styles.button} onPress={otpVisible ? handleVerifyOTP : () => handleSendOTP(formData.phoneNumber)}>
+                <Text style={styles.buttonText}>{otpVisible ? "Verify OTP" : "Send OTP"}</Text>
             </TouchableOpacity>
+
             <TouchableOpacity style={styles.googleButtonContainer}>
                 <View style={styles.googleButton}>
-                    <Text style={[styles.buttonText, { color: "#1D4550" }]}>
-                        Continue with Google
-                    </Text>
+                    <Text style={[styles.buttonText, { color: "#1D4550" }]}>Continue with Google</Text>
                 </View>
             </TouchableOpacity>
-            <View
-                style={{
-                    flexDirection: "row",
-                    width: "100%",
-                    justifyContent: "center",
-                }}
-            >
-                <Text style={{ fontSize: 16, marginRight: 5 }}>
-                    Already have an account?
-                </Text>
+
+            <View style={{ flexDirection: "row", width: "100%", justifyContent: "center" }}>
+                <Text style={{ fontSize: 16, marginRight: 5 }}>Already have an account?</Text>
                 <TouchableOpacity>
-                    <Link to="/Login" style={{ borderBottomWidth: 1 }}>
-                        Login
-                    </Link>
+                    <Link to="/Login" style={{ borderBottomWidth: 1 }}>Login</Link>
                 </TouchableOpacity>
             </View>
-        </View>
-    ) : (
-        <View style={styles.otpContainer}>
-            <TextInput
-                style={styles.input}
-                onChangeText={(value) => setOtp(value)}
-                value={formData.otp}
-                keyboardType="number-pad"
-            />
-            <Button title="Verify OTP" onPress={handleVerifyOTP} />
-            <Button title="back" onPress={() => setOtpSent(!otpSent)} />
         </View>
     );
 };
@@ -225,6 +225,21 @@ const styles = StyleSheet.create({
         textAlign: "center",
         fontSize: 18,
         fontWeight: "bold",
+    },
+    otpContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        width: "100%",
+        marginBottom: 12,
+    },
+    otpInput: {
+        width: "15%",
+        height: 45,
+        borderColor: "#4CAF85",
+        paddingHorizontal: 16,
+        borderRadius: 5,
+        backgroundColor: "#F6F6F6",
+        textAlign: "center",
     },
 });
 
