@@ -9,6 +9,7 @@ import { enterUpi } from '../actions/userActions';
 const Profile = () => {
   const [upi, setUpi] = useState('');
   const [user, setUser] = useState({});
+  const [upiAdded, setUpiAdded] = useState(false)
   const dispatch = useDispatch();
 
   const handleLogout = async () => {
@@ -31,8 +32,8 @@ const Profile = () => {
     if(!upi) return alert('Please enter UPI ID')
     if(!upi.includes('@')) return alert('Invalid UPI ID');
     const response = await enterUpi({upi, userId: user._id});
+    if(response && response.message) setUpiAdded(true);
     if(!response.message) return alert('Error adding UPI ID');
-    console.log(response);
   }
 
   return (
@@ -48,7 +49,7 @@ const Profile = () => {
         </ImageBackground>
         <Text style={styles.userName}>{user.name}</Text>
         <View style={styles.upiContainer}>
-          {user.upi || upi ? (
+          {user.upi || upiAdded ? (
             <Text style={{fontSize: 18}}>UPI: {user.upi || upi}</Text>
           ) : (
             <>

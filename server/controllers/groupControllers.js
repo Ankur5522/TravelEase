@@ -1,6 +1,7 @@
 import Group from "../models/groupModel.js";
 import User from "../models/userModel.js";
 import Transaction from "../models/transactionModel.js";
+import cron from "node-cron";
 
 export const getGroups = async (req, res) => {
     try {
@@ -212,3 +213,22 @@ export const splitAmount = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+//This is a scheduled task that runs every day at midnight to delete invalid groups.
+cron.schedule('0 0 * * *', () => {
+    deleteOldGroups();
+})
+
+const deleteOldGroups = async () => {
+    try {
+        const currentTime = new Date();
+        const oldGroups = await Group.find({
+            time: { $lt: currentTime },
+            confirmed: false
+        });
+        await Group.deleteMany({ _id: { $in: oldGroups.map(group => group._id) } });
+        console.log(`${oldGroups.length} old groups deleted successfully`);
+    } catch (error) {
+        console.error("Error deleting old groups:", error);
+    }
+}
