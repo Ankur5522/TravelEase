@@ -6,7 +6,8 @@ import { logout } from '../Reducers/userReducer';
 import UserAvatar from 'react-native-user-avatar';
 import { enterUpi } from '../actions/userActions';
 
-const Profile = () => {
+const Profile = ({navigation}) => {
+
   const [upi, setUpi] = useState('');
   const [user, setUser] = useState({});
   const [upiAdded, setUpiAdded] = useState(false)
@@ -15,6 +16,7 @@ const Profile = () => {
   const handleLogout = async () => {
     await AsyncStorage.removeItem('user');
     dispatch(logout());
+    navigation.navigate("Login");
   };
 
   useEffect(() => {
