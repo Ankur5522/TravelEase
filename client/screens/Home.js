@@ -7,6 +7,7 @@ import {
     FlatList,
     SafeAreaView,
     RefreshControl,
+    Button,
 } from "react-native";
 import UserAvatar from "react-native-user-avatar";
 import TripCard from "./helpComponents/tripCard";
@@ -104,13 +105,32 @@ const Home = () => {
                 </View>
             </ImageBackground>
             <SafeAreaView style={styles.tripsContainer}>
-                
-            {groups.length === 0 && (
-                <View style={styles.emptyTextContainer}>
-                    <Text style={styles.emptyTextMain}>No Groups requests right now.</Text>
-                    <Text style={styles.emptytextSecondary}>CLick to plus button below to create a new group.</Text>
-                </View>
-            )}
+                {groups.length === 0 && (
+                    <View style={styles.emptyTextContainer}>
+                        <Text style={styles.emptyTextMain}>
+                            No Groups requests right now.
+                        </Text>
+                        <Text style={styles.emptytextSecondary}>
+                            Click to plus button below to create a new group.
+                        </Text>
+                        <TouchableOpacity
+                            style={{
+                                backgroundColor: "black",
+                                paddingHorizontal: 10,
+                                paddingVertical: 5,
+                                marginTop: 10,
+                                borderRadius: 10
+                            }}
+                            onPress={fetchData}
+                        >
+                            <Text style={{
+                                color: "white",
+                                fontSize: 16,
+                                fontWeight: "600",
+                            }}>Refresh</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
                 <FlatList
                     ref={flatListRef}
                     data={groups}

@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from 'axios';
 
-const baseURL = 'http://10.0.2.2:5000';
+const baseURL = 'http://192.168.103.55:5000';
 
 const axiosInstance = axios.create({
     baseURL,

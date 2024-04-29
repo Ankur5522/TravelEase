@@ -6,6 +6,7 @@ import {
     FlatList,
     TouchableOpacity,
     ImageBackground,
+    RefreshControl,
 } from "react-native";
 import { useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -26,26 +27,30 @@ const MyGroups = ({ navigation }) => {
         userId: "",
     });
     const [displayPastGroups, setDisplayPastGroups] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const dispatch = useDispatch();
 
+    const fetchGroups = async () => {
+        setIsRefreshing(true);
+        const currentTime = new Date();
+        const JSONdata = await AsyncStorage.getItem("user");
+        const user = JSON.parse(JSONdata);
+        setCurrentUser(user);
+        const userGroups = groups.filter((group) =>
+            group.members.includes(user._id)
+        );
+        const currentGroups = userGroups?.filter((group) => {
+            return group.transactionId === null;
+        });
+        const pastGroups = userGroups?.filter(
+            (group) => !currentGroups.includes(group) && group.confirmed
+        );
+        setCurrentGroups(currentGroups);
+        setPastGroups(pastGroups);
+        setIsRefreshing(false);
+    };
+
     useEffect(() => {
-        const fetchGroups = async () => {
-            const currentTime = new Date();
-            const JSONdata = await AsyncStorage.getItem("user");
-            const user = JSON.parse(JSONdata);
-            setCurrentUser(user);
-            const userGroups = groups.filter((group) =>
-                group.members.includes(user._id)
-            );
-            const currentGroups = userGroups?.filter((group) => {
-                return group.transactionId === null;
-            });
-            const pastGroups = userGroups?.filter(
-                (group) => !currentGroups.includes(group) && group.confirmed
-            );
-            setCurrentGroups(currentGroups);
-            setPastGroups(pastGroups);
-        };
         fetchGroups();
     }, [groups]);
 
@@ -210,6 +215,12 @@ const MyGroups = ({ navigation }) => {
                         )}
                         keyExtractor={(item) => item._id}
                         ListEmptyComponent={<Text>No past groups</Text>}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={isRefreshing}
+                                onRefresh={fetchGroups}
+                            />
+                        }
                     />
                 ) : (
                     <FlatList
@@ -319,6 +330,12 @@ const MyGroups = ({ navigation }) => {
                         )}
                         keyExtractor={(item) => item._id}
                         ListEmptyComponent={<Text>No current groups</Text>}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={isRefreshing}
+                                onRefresh={fetchGroups}
+                            />
+                        }
                     />
                 )}
             </View>
