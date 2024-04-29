@@ -39,6 +39,10 @@ export const createGroup = async (req, res) => {
             return res.status(400).json({ error: "Invalid group data" });
         }
         const user = await User.findById(group.owner);
+        const allgroups = await Group.find({ members: user._id, confirmed: false });
+        if (allgroups.length > 0) {
+            return res.status(400).json({ error: "User already in a group" });
+        }
         let code;
         do {
             code = generateCode();
@@ -84,8 +88,14 @@ export const addUsertoGroup = async (req, res) => {
         if (group.members.includes(user._id)) {
             return res.status(400).json({ error: "User already in group" });
         }
+        const allgroups = await Group.find({ members: user._id, confirmed: false });
+        if (allgroups.length > 0) {
+            return res.status(400).json({ error: "User already in a group" });
+        }
         group.members.push(user._id);
-        group.seatVacant = group.seatVacant - 1;
+        group.seatVacant > 0 ? group.seatVacant - 1 : (
+            res.status(400).json({ error: "Group is full" })
+        );
         await group.save();
 
         res.status(200).json({ message: "User added to group successfully" });

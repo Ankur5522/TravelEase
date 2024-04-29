@@ -63,7 +63,7 @@ const Form = ({ navigation }) => {
                 navigation.navigate("Trips");
             })
             .catch((err) => {
-                alert("Error Creating Group" + err.message);
+                alert("Error Creating Group: " + err.message);
             });
     };
 
@@ -72,7 +72,7 @@ const Form = ({ navigation }) => {
             <View style={styles.upperPart}>
                 <ImageBackground
                     source={upperPartBg}
-                    style={{ width: "110%", minHeight: "35%"}}
+                    style={{ width: "110%", minHeight: "35%" }}
                 >
                     <View style={styles.upperFormContainer}>
                         <Text style={styles.upperTextName}>Hi Name</Text>
@@ -125,145 +125,148 @@ const Form = ({ navigation }) => {
                         </View>
                     </View>
                 </ImageBackground>
-            <View style={styles.lowerPart}>
-                <View
-                    style={[
-                        styles.timeContainer,
-                        {
-                            borderBottomWidth: 1,
-                            borderBottomColor: "#D8D8D84F",
-                        },
-                    ]}
-                >
+                <View style={styles.lowerPart}>
                     <View
-                        style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                        }}
+                        style={[
+                            styles.timeContainer,
+                            {
+                                borderBottomWidth: 1,
+                                borderBottomColor: "#D8D8D84F",
+                            },
+                        ]}
                     >
-                        <MaterialIcons
-                            name="access-time"
-                            size={32}
-                            color="black"
-                        />
-                        <Text
+                        <View
                             style={{
-                                marginLeft: 5,
-                                fontSize: 18,
+                                flexDirection: "row",
+                                alignItems: "center",
+                            }}
+                        >
+                            <MaterialIcons
+                                name="access-time"
+                                size={32}
+                                color="black"
+                            />
+                            <Text
+                                style={{
+                                    marginLeft: 5,
+                                    fontSize: 18,
+                                    fontWeight: "bold",
+                                }}
+                            >
+                                Time
+                            </Text>
+                        </View>
+                        {show && (
+                            <DateTimePicker
+                                value={date}
+                                mode="time"
+                                is24Hour={true}
+                                display="spinner"
+                                onChange={onChange}
+                            />
+                        )}
+                        <Text
+                            onPress={() => setShow(true)}
+                            style={{
+                                fontSize: 16,
                                 fontWeight: "bold",
                             }}
                         >
-                            Time
+                            {date.toLocaleTimeString()}
                         </Text>
                     </View>
-                    {show && (
-                        <DateTimePicker
-                            value={date}
-                            mode="time"
-                            is24Hour={true}
-                            display="spinner"
-                            onChange={onChange}
-                        />
-                    )}
-                    <Text
-                        onPress={() => setShow(true)}
-                        style={{
-                            fontSize: 16,
-                            fontWeight: "bold",
-                        }}
-                    >
-                        {date.toLocaleTimeString()}
-                    </Text>
-                </View>
-                <View style={styles.timeContainer}>
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                        }}
-                    >
-                        <MaterialCommunityIcons
-                            name="account-outline"
-                            size={34}
-                            color="black"
-                        />
-                        <Text
+                    <View style={styles.timeContainer}>
+                        <View
                             style={{
-                                marginLeft: 5,
-                                fontSize: 18,
-                                fontWeight: "bold",
+                                flexDirection: "row",
+                                alignItems: "center",
                             }}
                         >
-                            Seats Vacant
-                        </Text>
-                    </View>
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                        }}
-                    >
-                        <Entypo
-                            name="minus"
-                            size={28}
-                            color="black"
-                            onPress={() => {
-                                setFormData({
-                                    ...formData,
-                                    seatVacant:
-                                        formData.seatVacant > 0
-                                            ? formData.seatVacant - 1
-                                            : 0,
-                                });
-                            }}
-                        />
-                        <TextInput
+                            <MaterialCommunityIcons
+                                name="account-outline"
+                                size={34}
+                                color="black"
+                            />
+                            <Text
+                                style={{
+                                    marginLeft: 5,
+                                    fontSize: 18,
+                                    fontWeight: "bold",
+                                }}
+                            >
+                                Seats Vacant
+                            </Text>
+                        </View>
+                        <View
                             style={{
-                                fontSize: 22,
-                                textAlign: "center",
-                                fontWeight: "bold",
-                                marginHorizontal: 3,
+                                flexDirection: "row",
+                                alignItems: "center",
                             }}
-                            value={formData.seatVacant.toString()}
-                            onChangeText={(value) => {
-                                if (!isNaN(value)) {
+                        >
+                            <Entypo
+                                name="minus"
+                                size={28}
+                                color="black"
+                                onPress={() => {
                                     setFormData({
                                         ...formData,
-                                        seatVacant: parseInt(value),
+                                        seatVacant:
+                                            formData.seatVacant > 0
+                                                ? formData.seatVacant - 1
+                                                : 0,
                                     });
+                                }}
+                            />
+                            <TextInput
+                                style={{
+                                    fontSize: 22,
+                                    textAlign: "center",
+                                    fontWeight: "bold",
+                                    marginHorizontal: 3,
+                                }}
+                                value={formData.seatVacant.toString()}
+                                onChangeText={(value) => {
+                                    if (!isNaN(value)) {
+                                        setFormData({
+                                            ...formData,
+                                            seatVacant: parseInt(value),
+                                        });
+                                    }
+                                }}
+                                keyboardType="numeric"
+                            />
+                            <Entypo
+                                name="plus"
+                                size={28}
+                                color="black"
+                                onPress={() =>
+                                    setFormData({
+                                        ...formData,
+                                        seatVacant:
+                                            formData.seatVacant < 4
+                                                ? formData.seatVacant + 1
+                                                : 4,
+                                    })
                                 }
-                            }}
-                            keyboardType="numeric"
-                        />
-                        <Entypo
-                            name="plus"
-                            size={28}
-                            color="black"
-                            onPress={() =>
-                                setFormData({
-                                    ...formData,
-                                    seatVacant: formData.seatVacant + 1,
-                                })
-                            }
-                        />
+                            />
+                        </View>
                     </View>
+                    <TouchableOpacity onPress={handleSubmit}>
+                        <View style={styles.offerRideButton}>
+                            <Text
+                                style={{
+                                    color: "white",
+                                    fontSize: 18,
+                                    fontWeight: "bold",
+                                    marginRight: 10,
+                                }}
+                            >
+                                Offer Ride
+                            </Text>
+                            <AntDesign name="right" size={18} color="white" />
+                        </View>
+                    </TouchableOpacity>
                 </View>
-                <TouchableOpacity onPress={handleSubmit}>
-                    <View style={styles.offerRideButton}>
-                        <Text
-                            style={{
-                                color: "white",
-                                fontSize: 18,
-                                fontWeight: "bold",
-                                marginRight: 10,
-                            }}
-                        >
-                            Offer Ride
-                        </Text>
-                        <AntDesign name="right" size={18} color="white" />
-                    </View>
-                </TouchableOpacity>
-            </View>
             </View>
         </View>
     );

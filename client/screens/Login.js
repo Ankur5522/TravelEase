@@ -32,7 +32,7 @@ const Login = () => {
                 setErrorMsg("Invalid phone number or password");
             }
         } catch (error) {
-            console.log(error)
+            console.log("rror", error.message)
             setErrorMsg("An error occurred while logging in");
         }
     };

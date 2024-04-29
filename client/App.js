@@ -10,6 +10,7 @@ import { ClerkProvider } from "@clerk/clerk-expo";
 import NetInfo from "@react-native-community/netinfo";
 import { useState, useEffect } from "react";
 import SplashScreen from "./screens/SplashScreen";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const store = configureStore({
   reducer: {

@@ -14,6 +14,7 @@ const axiosInstance = axios.create({
 export const loginUser = createAsyncThunk('user/login', async (userData) => {
     try {
         const response = await axiosInstance.post('user/login', userData);
+        console.log(response);
         if (response.status >= 200 && response.status < 300) {
             return response.data;
         } else {
