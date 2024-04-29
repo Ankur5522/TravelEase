@@ -22,6 +22,9 @@ db.once('open', () => {
 });
 
 // Routes
+app.get('/', (req, res) => {
+    res.send('Server is running');
+});
 app.use('/user', userRoutes);
 app.use('/group', groupRoutes);
 app.use('/message',messageRoutes);
