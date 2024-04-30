@@ -4,7 +4,7 @@ import { Server } from 'socket.io';
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: '*' } });
+const io = new Server(server, { cors: { origin: 'exp://192.168.103.55:8081' } });
 
 const activeConnections = new Map();
 
